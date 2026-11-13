@@ -346,7 +346,7 @@ jobs:
         run: |
           set OUT=%TBUILD%\%REPO_NAME%\out\%BUILD_CONFIG%
           mkdir artifact
-          powershell -Command "Compress-Archive -Path '%OUT%\NoxGram.exe' -DestinationPath 'artifact\NoxGram-windows-${{ matrix.arch }}.zip'"
+          copy "%OUT%\NoxGram.exe" "artifact\NoxGram-windows-${{ matrix.arch }}.exe"
           if errorlevel 1 exit /b 1
           echo ARTIFACT_NAME=NoxGram-windows-${{ matrix.arch }}>>%GITHUB_ENV%
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -371,4 +371,4 @@ jobs:
               --title "NoxGram $TAG" \
               --notes "NoxGram build. macOS: open the .dmg and drag NoxGram to Applications. Until the app is notarized, start it the first time with right-click → Open." \
             || true
-          gh release upload "$TAG" "artifact/NoxGram-windows-${{ matrix.arch }}.zip" -R "$GITHUB_REPOSITORY" --clobber
+          gh release upload "$TAG" "artifact/NoxGram-windows-${{ matrix.arch }}.exe" -R "$GITHUB_REPOSITORY" --clobber

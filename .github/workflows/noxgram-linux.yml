@@ -233,12 +233,10 @@ jobs:
       - name: Move artifact.
         run: |
           cd out/$CONFIG
-          mkdir -p artifact package/NoxGram
-          cp NoxGram package/NoxGram/
-          strip package/NoxGram/NoxGram
-          # An artifact does not keep the executable bit, the archive does.
-          tar --owner=0 --group=0 --numeric-owner \
-            -cJf artifact/NoxGram-linux-${{ matrix.arch }}.tar.xz -C package NoxGram
+          mkdir -p artifact
+          # The release ships the bare executable: chmod +x and run it.
+          cp NoxGram artifact/NoxGram-linux-${{ matrix.arch }}
+          strip artifact/NoxGram-linux-${{ matrix.arch }}
           echo "ARTIFACT_NAME=NoxGram-linux-${{ matrix.arch }}" >> $GITHUB_ENV
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.UPLOAD_ARTIFACT == 'true'
@@ -261,4 +259,4 @@ jobs:
               --title "NoxGram $TAG" \
               --notes "NoxGram build. macOS: open the .dmg and drag NoxGram to Applications. Until the app is notarized, start it the first time with right-click → Open." \
             || true
-          gh release upload "$TAG" "out/$CONFIG/artifact/NoxGram-linux-${{ matrix.arch }}.tar.xz" -R "$GITHUB_REPOSITORY" --clobber
+          gh release upload "$TAG" "out/$CONFIG/artifact/NoxGram-linux-${{ matrix.arch }}" -R "$GITHUB_REPOSITORY" --clobber
