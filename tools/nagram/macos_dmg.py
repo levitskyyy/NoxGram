@@ -49,7 +49,6 @@ def settings(app):
         "icon_size": ICON_SIZE,
         "text_size": TEXT_SIZE,
         "background": str(BACKGROUND),
-        "hide_extensions": [app.name],
         "show_status_bar": False,
         "show_tab_view": False,
         "show_toolbar": False,
