@@ -6,6 +6,7 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "window/window_main_menu.h"
+#include "noxgram/lang.h"
 #include "nagram/chats/recent_chats.h"
 #include "nagram/media/extras.h"
 #include "nagram/interface/main_menu.h"
@@ -795,7 +796,7 @@ void MainMenu::setupMenu() {
 	if (Nagram::ForDevice().Get(Nox::kGhostMenuToggle)) {
 		// NoxGram: quick ghost mode switch.
 		const auto ghost = addAction(
-			tr::lng_nox_ghost_mode(),
+			Nox::Tr(u"lng_nox_ghost_mode"_q),
 			{ &st::menuIconStealth });
 		ghost->toggleOn(Nox::Ghost::ActiveValue());
 		ghost->toggledChanges(

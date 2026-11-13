@@ -1,4 +1,5 @@
 #include "nagram/settings/config.h"
+#include "noxgram/lang.h"
 
 #include "nagram/core/exchange.h"
 #include "nagram/core/diagnostics.h"
@@ -68,6 +69,9 @@ public:
 
 QString Title(const OptionInfo &info) {
 	const auto key = QByteArray(info.titleKey.data(), info.titleKey.size());
+	if (key.startsWith("lng_nox_")) {
+		return Nox::TrNow(QString::fromLatin1(key));
+	}
 	const auto index = Lang::GetKeyIndex(QLatin1String(key));
 	return (index == Lang::kKeysCount)
 		? QString::fromUtf8(key)

@@ -157,6 +157,7 @@ set(nagram_sources
     nagram/services/system_ai.cpp
     noxgram/ghost.cpp
     noxgram/ghost_spy_settings.cpp
+    noxgram/lang.cpp
     noxgram/spy.cpp
     noxgram/ws_transport.cpp
 )

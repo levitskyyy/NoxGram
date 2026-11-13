@@ -1,0 +1,6 @@
+/*
+NoxGram texts the settings code needs as compiled phrases. Everything
+else lives in noxgram.strings and is read at run time (noxgram/lang.h).
+*/
+"lng_nox_ghost_spy" = "Ghost and spy mode";
+"lng_nox_connection" = "Connection";

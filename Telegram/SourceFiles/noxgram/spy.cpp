@@ -9,6 +9,7 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "noxgram/spy.h"
+#include "noxgram/lang.h"
 
 #include "noxgram/options.h"
 #include "base/unixtime.h"
@@ -292,7 +293,7 @@ void AddRecordRows(
 		rpl::single(Ui::Text::Bold(header)),
 		st::boxDividerLabel));
 	const auto text = record.text.isEmpty()
-		? tr::lng_nox_spy_empty_text(tr::now)
+		? Nox::TrNow(u"lng_nox_spy_empty_text"_q)
 		: record.text;
 	const auto label = box->addRow(object_ptr<Ui::FlatLabel>(
 		box,
@@ -307,7 +308,7 @@ void EditHistoryBox(
 		std::vector<Record> versions,
 		QString current,
 		TimeId currentDate) {
-	box->setTitle(tr::lng_nox_spy_edit_history());
+	box->setTitle(Nox::Tr(u"lng_nox_spy_edit_history"_q));
 	box->setWidth(st::boxWideWidth);
 	const auto count = int(versions.size());
 	const auto shown = std::min(count, kMaxShown);
@@ -317,7 +318,7 @@ void EditHistoryBox(
 	AddRecordRows(
 		box,
 		Record{ .text = current },
-		tr::lng_nox_spy_current_version(tr::now)
+		Nox::TrNow(u"lng_nox_spy_current_version"_q)
 			+ (currentDate ? (u", "_q + FormatDate(currentDate)) : QString()));
 	box->addButton(tr::lng_close(), [=] { box->closeBox(); });
 }
@@ -325,13 +326,13 @@ void EditHistoryBox(
 void DeletedBox(
 		not_null<Ui::GenericBox*> box,
 		not_null<PeerData*> peer) {
-	box->setTitle(tr::lng_nox_spy_deleted_messages());
+	box->setTitle(Nox::Tr(u"lng_nox_spy_deleted_messages"_q));
 	box->setWidth(st::boxWideWidth);
 	const auto list = Deleted(peer);
 	if (list.empty()) {
 		box->addRow(object_ptr<Ui::FlatLabel>(
 			box,
-			tr::lng_nox_spy_deleted_none(),
+			Nox::Tr(u"lng_nox_spy_deleted_none"_q),
 			st::boxLabel));
 	}
 	const auto count = int(list.size());
@@ -343,15 +344,14 @@ void DeletedBox(
 			: (record.fromName + u", "_q))
 			+ FormatDate(record.date)
 			+ (record.at
-				? (u" → "_q + tr::lng_nox_spy_deleted_at(
-					tr::now,
-					lt_date,
-					FormatDate(record.at)))
+				? (u" → "_q + Nox::TrNow(
+					u"lng_nox_spy_deleted_at"_q,
+					{ { u"date"_q, FormatDate(record.at) } }))
 				: QString());
 		AddRecordRows(box, record, header);
 	}
 	if (!list.empty()) {
-		box->addLeftButton(tr::lng_nox_spy_clear(), [=] {
+		box->addLeftButton(Nox::Tr(u"lng_nox_spy_clear"_q), [=] {
 			ClearDeleted(peer);
 			box->closeBox();
 		});
@@ -362,7 +362,7 @@ void DeletedBox(
 } // namespace
 
 QString DeletedMark() {
-	return tr::lng_nox_deleted_mark(tr::now);
+	return Nox::TrNow(u"lng_nox_deleted_mark"_q);
 }
 
 bool KeepDeleted(not_null<HistoryItem*> item) {
@@ -448,7 +448,7 @@ void AddMessageActions(
 	}
 	const auto itemId = item->fullId();
 	const auto session = &item->history()->session();
-	menu->addAction(tr::lng_nox_spy_edit_history(tr::now), crl::guard(
+	menu->addAction(Nox::TrNow(u"lng_nox_spy_edit_history"_q), crl::guard(
 		controller,
 		[=] {
 			if (const auto item = session->data().message(itemId)) {
@@ -465,7 +465,7 @@ void AddPeerMenu(
 		return;
 	}
 	addAction(
-		tr::lng_nox_spy_deleted_messages(tr::now),
+		Nox::TrNow(u"lng_nox_spy_deleted_messages"_q),
 		crl::guard(controller, [=] { ShowDeleted(controller, peer); }),
 		&st::menuIconRestore);
 }

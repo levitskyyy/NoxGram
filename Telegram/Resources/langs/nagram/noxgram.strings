@@ -3,7 +3,6 @@ NoxGram strings. Ghost mode and spy mode are modelled on AyuGram Desktop
 (https://github.com/AyuGram/AyuGramDesktop).
 */
 
-"lng_nox_ghost_spy" = "Ghost and spy mode";
 "lng_nox_ghost_title" = "Ghost mode";
 "lng_nox_ghost_mode" = "Ghost mode";
 "lng_nox_ghost_mode_about" = "While ghost mode is on, the parts selected below are not sent to Telegram. You can switch it quickly from the main menu.";
@@ -34,7 +33,6 @@ NoxGram strings. Ghost mode and spy mode are modelled on AyuGram Desktop
 "lng_nox_spy_empty_text" = "(no text)";
 "lng_nox_spy_clear" = "Clear";
 
-"lng_nox_connection" = "Connection";
 "lng_nox_ws_title" = "WebSocket connection";
 "lng_nox_ws_transport" = "Connect through web.telegram.org";
 "lng_nox_ws_transport_about" = "MTProto traffic goes inside a secure WebSocket (TLS) to Telegram's own web servers, the way Telegram Web connects. To the network it looks like ordinary HTTPS, which helps where direct connections to Telegram are blocked or slowed down. Messages stay encrypted by MTProto as usual. Doesn't apply while a proxy is on.";

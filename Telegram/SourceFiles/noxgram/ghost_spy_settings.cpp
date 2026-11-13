@@ -11,6 +11,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "noxgram/ghost.h"
 #include "noxgram/options.h"
+#include "noxgram/lang.h"
 #include "nagram/settings/home.h"
 #include "lang/lang_keys.h"
 #include "settings/settings_builder.h"
@@ -80,68 +81,68 @@ const auto kMeta = BuildHelper({
 	.title = &tr::lng_nox_ghost_spy,
 	.icon = &st::menuIconStealth,
 }, [](SectionBuilder &builder) {
-	builder.addSubsectionTitle(tr::lng_nox_ghost_title());
+	builder.addSubsectionTitle(Nox::Tr(u"lng_nox_ghost_title"_q));
 	AddToggle(builder, kGhostMode,
-		tr::lng_nox_ghost_mode(),
+		Nox::Tr(u"lng_nox_ghost_mode"_q),
 		u"noxgram/ghost/enabled"_q,
 		{ u"ghost"_q, u"stealth"_q, u"invisible"_q },
 		&st::settingsButton,
 		{ &st::menuIconStealth });
-	builder.addDividerText(tr::lng_nox_ghost_mode_about());
+	builder.addDividerText(Nox::Tr(u"lng_nox_ghost_mode_about"_q));
 	AddToggle(builder, kGhostHideRead,
-		tr::lng_nox_ghost_hide_read(),
+		Nox::Tr(u"lng_nox_ghost_hide_read"_q),
 		u"noxgram/ghost/hide-read"_q,
 		{ u"read"_q, u"receipts"_q, u"ghost"_q });
 	AddToggle(builder, kGhostHideStories,
-		tr::lng_nox_ghost_hide_stories(),
+		Nox::Tr(u"lng_nox_ghost_hide_stories"_q),
 		u"noxgram/ghost/hide-stories"_q,
 		{ u"stories"_q, u"views"_q, u"ghost"_q });
 	AddToggle(builder, kGhostHideOnline,
-		tr::lng_nox_ghost_hide_online(),
+		Nox::Tr(u"lng_nox_ghost_hide_online"_q),
 		u"noxgram/ghost/hide-online"_q,
 		{ u"online"_q, u"last seen"_q, u"ghost"_q });
 	AddToggle(builder, kGhostHideTyping,
-		tr::lng_nox_ghost_hide_typing(),
+		Nox::Tr(u"lng_nox_ghost_hide_typing"_q),
 		u"noxgram/ghost/hide-typing"_q,
 		{ u"typing"_q, u"upload"_q, u"ghost"_q });
 	AddToggle(builder, kGhostOfflineAfterOnline,
-		tr::lng_nox_ghost_offline_after_online(),
+		Nox::Tr(u"lng_nox_ghost_offline_after_online"_q),
 		u"noxgram/ghost/offline-after-online"_q,
 		{ u"offline"_q, u"online"_q, u"ghost"_q });
-	builder.addDividerText(tr::lng_nox_ghost_offline_after_online_about());
+	builder.addDividerText(Nox::Tr(u"lng_nox_ghost_offline_after_online_about"_q));
 	AddToggle(builder, kGhostReadOnAction,
-		tr::lng_nox_ghost_read_on_action(),
+		Nox::Tr(u"lng_nox_ghost_read_on_action"_q),
 		u"noxgram/ghost/read-on-action"_q,
 		{ u"read"_q, u"reply"_q, u"ghost"_q });
-	builder.addDividerText(tr::lng_nox_ghost_read_on_action_about());
+	builder.addDividerText(Nox::Tr(u"lng_nox_ghost_read_on_action_about"_q));
 	AddToggle(builder, kGhostScheduleSend,
-		tr::lng_nox_ghost_schedule_send(),
+		Nox::Tr(u"lng_nox_ghost_schedule_send"_q),
 		u"noxgram/ghost/schedule-send"_q,
 		{ u"schedule"_q, u"send"_q, u"ghost"_q });
-	builder.addDividerText(tr::lng_nox_ghost_schedule_send_about());
+	builder.addDividerText(Nox::Tr(u"lng_nox_ghost_schedule_send_about"_q));
 	AddToggle(builder, kGhostMenuToggle,
-		tr::lng_nox_ghost_menu_toggle(),
+		Nox::Tr(u"lng_nox_ghost_menu_toggle"_q),
 		u"noxgram/ghost/menu-toggle"_q,
 		{ u"menu"_q, u"ghost"_q });
 
-	builder.addSubsectionTitle(tr::lng_nox_spy_title());
+	builder.addSubsectionTitle(Nox::Tr(u"lng_nox_spy_title"_q));
 	AddToggle(builder, kSaveDeleted,
-		tr::lng_nox_save_deleted(),
+		Nox::Tr(u"lng_nox_save_deleted"_q),
 		u"noxgram/spy/save-deleted"_q,
 		{ u"deleted"_q, u"spy"_q, u"history"_q });
 	AddToggle(builder, kSaveEdits,
-		tr::lng_nox_save_edits(),
+		Nox::Tr(u"lng_nox_save_edits"_q),
 		u"noxgram/spy/save-edits"_q,
 		{ u"edited"_q, u"spy"_q, u"history"_q });
 	AddToggle(builder, kKeepSelfDestructing,
-		tr::lng_nox_keep_self_destructing(),
+		Nox::Tr(u"lng_nox_keep_self_destructing"_q),
 		u"noxgram/spy/keep-self-destructing"_q,
 		{ u"self-destruct"_q, u"timer"_q, u"spy"_q });
 	AddToggle(builder, kSaveForBots,
-		tr::lng_nox_save_for_bots(),
+		Nox::Tr(u"lng_nox_save_for_bots"_q),
 		u"noxgram/spy/save-for-bots"_q,
 		{ u"bots"_q, u"spy"_q });
-	builder.addDividerText(tr::lng_nox_spy_about());
+	builder.addDividerText(Nox::Tr(u"lng_nox_spy_about"_q));
 });
 
 const SectionBuildMethod GhostSpySection::kBuild = kMeta.build;
@@ -170,19 +171,19 @@ const auto kConnectionMeta = BuildHelper({
 	.title = &tr::lng_nox_connection,
 	.icon = &st::menuIconNetwork,
 }, [](SectionBuilder &builder) {
-	builder.addSubsectionTitle(tr::lng_nox_ws_title());
+	builder.addSubsectionTitle(Nox::Tr(u"lng_nox_ws_title"_q));
 	AddToggle(builder, kWsTransport,
-		tr::lng_nox_ws_transport(),
+		Nox::Tr(u"lng_nox_ws_transport"_q),
 		u"noxgram/connection/websocket"_q,
 		{ u"websocket"_q, u"web"_q, u"proxy"_q, u"blocking"_q, u"dpi"_q },
 		&st::settingsButton,
 		{ &st::menuIconNetwork });
-	builder.addDividerText(tr::lng_nox_ws_transport_about());
+	builder.addDividerText(Nox::Tr(u"lng_nox_ws_transport_about"_q));
 	AddToggle(builder, kWsDirectFallback,
-		tr::lng_nox_ws_direct_fallback(),
+		Nox::Tr(u"lng_nox_ws_direct_fallback"_q),
 		u"noxgram/connection/direct-fallback"_q,
 		{ u"websocket"_q, u"direct"_q, u"fallback"_q });
-	builder.addDividerText(tr::lng_nox_ws_direct_fallback_about());
+	builder.addDividerText(Nox::Tr(u"lng_nox_ws_direct_fallback_about"_q));
 });
 
 const SectionBuildMethod ConnectionSection::kBuild = kConnectionMeta.build;
