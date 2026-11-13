@@ -27,8 +27,8 @@ jobs:
       github.event_name != 'push'
       || !contains(github.event.head_commit.message, '-only]')
       || contains(github.event.head_commit.message, '[linux-only]')
-    name: Rocky Linux 8
-    runs-on: ubuntu-24.04
+    name: Rocky Linux 8 (${{ matrix.arch }})
+    runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
 
     # Dropping superseded caches needs to delete them.
     permissions:
@@ -39,6 +39,7 @@ jobs:
       fail-fast: false
       matrix:
         config: [Release]
+        arch: [x86_64, aarch64]
         defines:
           - ""
 
@@ -57,6 +58,7 @@ jobs:
       - name: First set up.
         env:
           CCACHE_SHA256: 508b2a1217dc6e04a23e967c7b95a0fb45d8a7e16fde9e180919698f2e2be060
+          ARCH: ${{ matrix.arch }}
         run: |
           retry="$GITHUB_WORKSPACE/tools/nagram/retry.sh"
           download=(curl -fsSL --retry 5 --retry-all-errors --retry-delay 10)
@@ -64,11 +66,16 @@ jobs:
           # Saved to a file: piped into python3, a failed download went unnoticed.
           "${download[@]}" -o "$RUNNER_TEMP/install-poetry.py" https://install.python-poetry.org
           "$retry" 3 30 python3 "$RUNNER_TEMP/install-poetry.py" --version 2.5.1
-          "${download[@]}" -o "$RUNNER_TEMP/ccache.tar.xz" \
-            https://github.com/ccache/ccache/releases/download/v4.13.6/ccache-4.13.6-linux-x86_64-glibc.tar.xz
-          echo "$CCACHE_SHA256  $RUNNER_TEMP/ccache.tar.xz" | sha256sum -c -
-          sudo tar -xJf "$RUNNER_TEMP/ccache.tar.xz" -C /usr/local/bin --strip-components=1 \
-            ccache-4.13.6-linux-x86_64-glibc/ccache
+          if [ "$ARCH" = x86_64 ]; then
+            "${download[@]}" -o "$RUNNER_TEMP/ccache.tar.xz" \
+              https://github.com/ccache/ccache/releases/download/v4.13.6/ccache-4.13.6-linux-x86_64-glibc.tar.xz
+            echo "$CCACHE_SHA256  $RUNNER_TEMP/ccache.tar.xz" | sha256sum -c -
+            sudo tar -xJf "$RUNNER_TEMP/ccache.tar.xz" -C /usr/local/bin --strip-components=1 \
+              ccache-4.13.6-linux-x86_64-glibc/ccache
+          else
+            # ccache publishes no ARM binaries.
+            "$retry" 3 30 sudo apt-get install -y ccache
+          fi
           echo "CCACHE_DIR=$RUNNER_TEMP/.tdesktop-cache" >> $GITHUB_ENV
           cd Telegram/build/docker/centos_env
           "$retry" 3 30 poetry install
@@ -92,8 +99,8 @@ jobs:
           path: |
             ${{ runner.temp }}/.buildx-cache
             ${{ runner.temp }}/.mount-cache
-          key: ${{ runner.OS }}-libs-${{ hashFiles('Telegram/build/docker/centos_env/**') }}
-          restore-keys: ${{ runner.OS }}-libs-
+          key: ${{ runner.OS }}${{ matrix.arch == 'aarch64' && '-aarch64' || '' }}-libs-${{ hashFiles('Telegram/build/docker/centos_env/**') }}
+          restore-keys: ${{ runner.OS }}${{ matrix.arch == 'aarch64' && '-aarch64' || '' }}-libs-
 
       - name: Restore Docker cache mounts.
         uses: reproducible-containers/buildkit-cache-dance@5422eac04292c961a382e0f584ea0f03ad9da723
@@ -123,8 +130,8 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.OS }}-tdesktop-${{ env.CONFIG == 'Release' && 'release-' || '' }}${{ matrix.defines || 'null' }}-${{ github.run_id }}
-          restore-keys: ${{ runner.OS }}-tdesktop-${{ env.CONFIG == 'Release' && 'release-' || '' }}${{ matrix.defines || 'null' }}-
+          key: ${{ runner.OS }}${{ matrix.arch == 'aarch64' && '-aarch64' || '' }}-tdesktop-${{ env.CONFIG == 'Release' && 'release-' || '' }}${{ matrix.defines || 'null' }}-${{ github.run_id }}
+          restore-keys: ${{ runner.OS }}${{ matrix.arch == 'aarch64' && '-aarch64' || '' }}-tdesktop-${{ env.CONFIG == 'Release' && 'release-' || '' }}${{ matrix.defines || 'null' }}-
 
       - name: NoxGram build.
         if: env.ONLY_CACHE == 'false'
@@ -205,7 +212,7 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-          LIBS_KEY: ${{ runner.OS }}-libs-${{ hashFiles('Telegram/build/docker/centos_env/**') }}
+          LIBS_KEY: ${{ runner.OS }}${{ matrix.arch == 'aarch64' && '-aarch64' || '' }}-libs-${{ hashFiles('Telegram/build/docker/centos_env/**') }}
           TDESKTOP_KEY: ${{ steps.cache-tdesktop.outputs.cache-primary-key }}
         run: bash tools/nagram/drop_superseded_caches.sh "$LIBS_KEY" "$TDESKTOP_KEY"
 
@@ -231,8 +238,8 @@ jobs:
           strip package/NoxGram/NoxGram
           # An artifact does not keep the executable bit, the archive does.
           tar --owner=0 --group=0 --numeric-owner \
-            -cJf artifact/NoxGram-linux-x86_64.tar.xz -C package NoxGram
-          echo "ARTIFACT_NAME=NoxGram-linux" >> $GITHUB_ENV
+            -cJf artifact/NoxGram-linux-${{ matrix.arch }}.tar.xz -C package NoxGram
+          echo "ARTIFACT_NAME=NoxGram-linux-${{ matrix.arch }}" >> $GITHUB_ENV
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.UPLOAD_ARTIFACT == 'true'
         name: Upload artifact.
@@ -254,4 +261,4 @@ jobs:
               --title "NoxGram $TAG" \
               --notes "NoxGram build for testing. macOS: unpack, move to Applications, right-click and choose Open (the app is not notarized)." \
             || true
-          gh release upload "$TAG" "out/$CONFIG/artifact/NoxGram-linux-x86_64.tar.xz" -R "$GITHUB_REPOSITORY" --clobber
+          gh release upload "$TAG" "out/$CONFIG/artifact/NoxGram-linux-${{ matrix.arch }}.tar.xz" -R "$GITHUB_REPOSITORY" --clobber
