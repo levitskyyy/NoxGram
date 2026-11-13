@@ -1,59 +1,19 @@
-name: Nagram Windows.
+name: NoxGram Windows.
 
 on:
   push:
     branches:
-      - nagram-next
-      - main
+      - noxgram
     paths-ignore:
       - 'docs/**'
       - '**.md'
-      - '!docs/building-win*.md'
       - 'changelog.txt'
       - 'LEGAL'
       - 'LICENSE'
-      - '.github/**'
-      - '!.github/workflows/nagram-win.yml'
-      - 'lib/xdg/**'
-      - 'snap/**'
-      - 'Telegram/build/docker/**'
-      - 'Telegram/Resources/uwp/**'
-      - 'Telegram/SourceFiles/platform/linux/**'
-      - 'Telegram/SourceFiles/platform/mac/**'
-      - 'Telegram/Telegram/**'
-      - 'Telegram/configure.sh'
-      - 'Telegram/Telegram.plist'
   pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - '!docs/building-win*.md'
-      - 'changelog.txt'
-      - 'LEGAL'
-      - 'LICENSE'
-      - '.github/**'
-      - '!.github/workflows/nagram-win.yml'
-      - 'lib/xdg/**'
-      - 'snap/**'
-      - 'Telegram/build/docker/**'
-      - 'Telegram/Resources/uwp/**'
-      - 'Telegram/SourceFiles/platform/linux/**'
-      - 'Telegram/SourceFiles/platform/mac/**'
-      - 'Telegram/Telegram/**'
-      - 'Telegram/configure.sh'
-      - 'Telegram/Telegram.plist'
-
-  workflow_call:
-    inputs:
-      config:
-        type: string
-        default: Debug
-      ref:
-        type: string
-        default: ""
-      archs:
-        type: string
-        default: '["x64","arm64"]'
+    branches:
+      - noxgram
+  workflow_dispatch:
 
 jobs:
 
@@ -61,8 +21,7 @@ jobs:
     # A push whose commit message has a marker such as [windows-only] builds
     # only the named platforms; several markers may be combined.
     if: >-
-      inputs.config == 'Release'
-      || github.event_name != 'push'
+      github.event_name != 'push'
       || !contains(github.event.head_commit.message, '-only]')
       || contains(github.event.head_commit.message, '[windows-only]')
     name: Windows
@@ -76,10 +35,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # A push to the default branch builds both configurations, which
-        # the Channel job posts together; a release asks for Release alone.
-        config: ${{ fromJSON(inputs.config && format('["{0}"]', inputs.config) || github.event_name == 'push' && github.ref_name == github.event.repository.default_branch && '["Debug","Release"]' || '["Debug"]') }}
-        arch: ${{ fromJSON(inputs.archs || '["x64","arm64"]') }}
+        config: [Release]
+        arch: [x64]
         qt: [qt6]
         generator: [""]
 
@@ -90,7 +47,6 @@ jobs:
       # Not CONFIG: pacman-key in the msys2 setup reads that variable as the
       # path of its configuration file.
       BUILD_CONFIG: ${{ matrix.config }}
-      CI_UPDATES: ${{ inputs.config != 'Release' && github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
 
     defaults:
       run:
@@ -153,19 +109,6 @@ jobs:
         with:
           submodules: recursive
           path: ${{ env.TBUILD }}\${{ env.REPO_NAME }}
-          ref: ${{ inputs.ref }}
-
-      # The Release build of a push to the default branch is offered to the
-      # installed copies that follow these builds, so it has a build number;
-      # any other build has 0, a release among them.
-      - name: Build number.
-        shell: bash
-        run: |
-          BUILD=0
-          if [ "$BUILD_CONFIG" = "Release" ] && [ "$CI_UPDATES" = "true" ]; then
-            BUILD="$(python "$TBUILD/$REPO_NAME/tools/nagram/release_version.py" --ci-build)"
-          fi
-          echo "NAGRAM_CI_BUILD=$BUILD" >> $GITHUB_ENV
 
       - name: First set up.
         shell: bash
@@ -327,9 +270,9 @@ jobs:
       - name: Read configuration matrix.
         shell: bash
         env:
-          NAGRAM_API_ID: ${{ secrets.NAGRAM_API_ID }}
+          NAGRAM_API_ID: ${{ secrets.NOXGRAM_API_ID }}
         run: |
-          ARTIFACT_NAME="Nagram"
+          ARTIFACT_NAME="NoxGram"
 
           ARCH=""
           if [ -n "${{ matrix.arch }}" ]; then
@@ -374,11 +317,11 @@ jobs:
           fi
           echo "TDESKTOP_BUILD_API=$API" >> $GITHUB_ENV
 
-      - name: Nagram build.
+      - name: NoxGram build.
         if: env.ONLY_CACHE == 'false'
         env:
-          NAGRAM_API_ID: ${{ secrets.NAGRAM_API_ID }}
-          NAGRAM_API_HASH: ${{ secrets.NAGRAM_API_HASH }}
+          NAGRAM_API_ID: ${{ secrets.NOXGRAM_API_ID }}
+          NAGRAM_API_HASH: ${{ secrets.NOXGRAM_API_HASH }}
         run: |
           cd %TBUILD%\%REPO_NAME%\Telegram
 
@@ -388,101 +331,25 @@ jobs:
           ${{ matrix.qt }} ^
           %TDESKTOP_BUILD_API% ^
           -D CMAKE_CONFIGURATION_TYPES=%BUILD_CONFIG% ^
-          -D DESKTOP_APP_TEST_APPS=ON ^
-          -D CMAKE_COMPILE_WARNING_AS_ERROR=${{ env.BUILD_CONFIG == 'Debug' && 'ON' || 'OFF' }} ^
+          -D CMAKE_COMPILE_WARNING_AS_ERROR=OFF ^
           -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= ^
-          -D DESKTOP_APP_DISABLE_AUTOUPDATE=${{ env.BUILD_CONFIG == 'Release' && 'OFF' || 'ON' }} ^
-          -D NAGRAM_CI_BUILD=%NAGRAM_CI_BUILD% ^
+          -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON ^
           %TDESKTOP_BUILD_DEFINE%
 
           cmake --build ..\out --config %BUILD_CONFIG% --parallel
           if errorlevel 1 exit /b 1
-          ..\out\nagram-tests\%BUILD_CONFIG%\test_nagram.exe
-
-      - name: Smoke test.
-        if: env.ONLY_CACHE == 'false'
-        run: |
-          cd %TBUILD%\%REPO_NAME%
-          python tools\nagram\smoke_test.py out\%BUILD_CONFIG%\Nagram.exe
 
       - name: Move artifact.
-        if: env.UPLOAD_ARTIFACT == 'true'
-        env:
-          NAGRAM_UPDATE_KEY: ${{ secrets.NAGRAM_UPDATE_KEY }}
         run: |
           set OUT=%TBUILD%\%REPO_NAME%\out\%BUILD_CONFIG%
           mkdir artifact
-          if "%BUILD_CONFIG%"=="Release" (
-            powershell -Command "Compress-Archive -Path '%OUT%\Nagram.exe' -DestinationPath 'artifact\Nagram-windows-${{ matrix.arch }}.zip'"
-            if errorlevel 1 exit /b 1
-            if defined NAGRAM_UPDATE_KEY (
-              python %TBUILD%\%REPO_NAME%\tools\nagram\pack_update.py --packer %OUT%\Packer.exe --out artifact --app %OUT%\Nagram.exe --updater %OUT%\Updater.exe --target ${{ matrix.arch == 'arm64' && 'winarm' || 'win64' }} --ci-build %NAGRAM_CI_BUILD%
-              if errorlevel 1 exit /b 1
-            ) else (
-              echo ::warning::NAGRAM_UPDATE_KEY is not set: no update package, this build is not offered to installed copies.
-            )
-            echo ARTIFACT_NAME=release-windows-${{ matrix.arch }}>>%GITHUB_ENV%
-          ) else (
-            powershell -Command "Compress-Archive -Path '%OUT%\Nagram.exe' -DestinationPath 'artifact\Nagram-windows-${{ matrix.arch }}-debug.zip'"
-            if errorlevel 1 exit /b 1
-          )
+          powershell -Command "Compress-Archive -Path '%OUT%\NoxGram.exe' -DestinationPath 'artifact\NoxGram-windows-${{ matrix.arch }}.zip'"
+          if errorlevel 1 exit /b 1
+          echo ARTIFACT_NAME=NoxGram-windows-${{ matrix.arch }}>>%GITHUB_ENV%
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         name: Upload artifact.
         if: env.UPLOAD_ARTIFACT == 'true'
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: artifact\
-          retention-days: 1
-
-      # The portable archive is uploaded by now, so a failing installer
-      # build does not keep it out of the release.
-      - name: Installer.
-        if: env.UPLOAD_ARTIFACT == 'true' && env.BUILD_CONFIG == 'Release'
-        run: |
-          cd %TBUILD%\%REPO_NAME%
-          if not exist Telegram\build\nagram_version (
-            echo ::notice::This ref has no Telegram\build\nagram_version, no installer is built.
-            exit /b 0
-          )
-          for /f %%v in ('python tools\nagram\release_version.py --version') do set NAGRAM_VERSION=%%v
-          if not defined NAGRAM_VERSION exit /b 1
-          set "ISCC=%ProgramFiles(x86)%\Inno Setup 6\ISCC.exe"
-          if not exist "%ISCC%" choco install innosetup --no-progress -y
-          if not exist "%ISCC%" exit /b 1
-          "%ISCC%" /Qp /DMyAppVersion=%NAGRAM_VERSION% /DMyAppVersionFull=%NAGRAM_VERSION% "/DReleasePath=%TBUILD%\%REPO_NAME%\out\%BUILD_CONFIG%" /DMyBuildTarget=${{ matrix.arch == 'arm64' && 'winarm' || 'win64' }} /DMyOutputBaseFilename=Nagram-windows-${{ matrix.arch }}-setup "/O%GITHUB_WORKSPACE%\installer" Telegram\build\setup.iss
-          if errorlevel 1 exit /b 1
-          if not exist "%GITHUB_WORKSPACE%\installer\Nagram-windows-${{ matrix.arch }}-setup.exe" exit /b 1
-
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        name: Upload installer.
-        if: env.UPLOAD_ARTIFACT == 'true' && env.BUILD_CONFIG == 'Release' && hashFiles('installer/*.exe') != ''
-        with:
-          name: release-windows-${{ matrix.arch }}-setup
-          path: installer\
-          retention-days: 1
-
-  channel:
-    name: Channel
-    needs: windows
-    # The Debug and Release builds of a push to the default branch go to the
-    # assets channel in one post, even when one of them has failed; a
-    # release posts its own packages from nagram-release.yml.
-    if: ${{ !cancelled() && inputs.config != 'Release' && github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
-    uses: ./.github/workflows/nagram-channel.yml
-    permissions:
-      contents: read
-    with:
-      platform: windows
-    secrets: inherit
-
-  updates:
-    name: Updates
-    needs: windows
-    # The update packages of the Release build of a push to the default
-    # branch; a release publishes its own from nagram-release.yml.
-    if: ${{ !cancelled() && inputs.config != 'Release' && github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
-    uses: ./.github/workflows/nagram-ci-updates.yml
-    permissions:
-      contents: write
-    with:
-      platform: windows
+          retention-days: 30

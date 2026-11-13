@@ -1,0 +1,176 @@
+name: NoxGram macOS.
+
+on:
+  push:
+    branches:
+      - noxgram
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - 'changelog.txt'
+      - 'LEGAL'
+      - 'LICENSE'
+  pull_request:
+    branches:
+      - noxgram
+  workflow_dispatch:
+
+jobs:
+
+  macos:
+    # A push whose commit message has a marker such as [macos-only] builds
+    # only the named platforms; several markers may be combined.
+    if: >-
+      github.event_name != 'push'
+      || !contains(github.event.head_commit.message, '-only]')
+      || contains(github.event.head_commit.message, '[macos-only]')
+    name: MacOS
+    runs-on: macos-26
+
+    # Dropping superseded caches needs to delete them.
+    permissions:
+      contents: read
+      actions: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [Release]
+        defines:
+          - ""
+    env:
+      UPLOAD_ARTIFACT: "true"
+      ONLY_CACHE: "false"
+      PREPARE_PATH: "Telegram/build/prepare/prepare.py"
+      CONFIG: ${{ matrix.config }}
+
+    steps:
+      - name: Get repository name.
+        run: echo "REPO_NAME=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
+
+      - name: Clone.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+          path: ${{ env.REPO_NAME }}
+
+      - name: First set up.
+        run: |
+          sudo chown -R `whoami`:admin /usr/local/share
+
+          retry="$REPO_NAME/tools/nagram/retry.sh"
+          "$retry" 3 30 brew update
+          brew upgrade || true
+          "$retry" 3 30 brew install automake libtool meson nasm ninja pkg-config
+
+          # Disable spotlight.
+          sudo mdutil -a -i off
+
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+          sudo sed -i '' '/CMAKE_${lang}_FLAGS_DEBUG_INIT/s/ -g//' /opt/homebrew/share/cmake/Modules/Compiler/GNU.cmake
+
+      # Debug and Release share one copy of the libraries, built with their
+      # release variants: a release cache saved from a tag run is visible only
+      # to that tag, and a second copy does not fit the repository quota.
+      # The key names the repository because the libraries record their
+      # absolute paths: after a rename every one of them is rebuilt, and a hit
+      # on the old key would keep that rebuild from being saved.
+      - name: Libraries cache.
+        id: cache-libs
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            Libraries
+            ThirdParty
+          key: ${{ runner.OS }}-libs-v3-${{ env.REPO_NAME }}-${{ hashFiles(format('{0}/{1}', env.REPO_NAME, env.PREPARE_PATH)) }}
+          restore-keys: ${{ runner.OS }}-libs-v3-${{ env.REPO_NAME }}-
+
+      - name: Libraries.
+        run: |
+          ./$REPO_NAME/Telegram/build/prepare/mac.sh silent
+
+      # Old caches would push the libraries out of the repository quota.
+      - name: Drop superseded caches.
+        if: github.ref_name == github.event.repository.default_branch
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LIBS_KEY: ${{ runner.OS }}-libs-v3-${{ env.REPO_NAME }}-${{ hashFiles(format('{0}/{1}', env.REPO_NAME, env.PREPARE_PATH)) }}
+        run: |
+          bash "$REPO_NAME/tools/nagram/drop_superseded_caches.sh" "$LIBS_KEY"
+
+      # local/src/wallet_engine holds the generated wallet_engine.cpp, which
+      # cmake/external/wallet_engine compiles into the app: a build input that
+      # matches none of the extensions kept below. The tlottie and
+      # wallet-engine checkouts are the sources of the tdesktop_rust stage, so
+      # a cache without them restores a valid stage key and cannot rebuild the
+      # stage; only their cargo target trees are dropped. The expression is
+      # the one of the macOS job of canary.yml.
+      - name: Free up some disk space.
+        run: find Libraries '(' '(' ! '(' -name '*.a' -o -name '*.h' -o -name '*.hpp' -o -name '*.inc' -o -name '*.cmake' -o -name '*.pc' -o -name 'macos_toolchain.json' -o -path '*/include/*' -o -path '*/objects-*' -o -path '*/cache_keys/*' -o -path '*/patches/*' -o -path '*/src/wallet_engine/*' -o '(' '(' -path '*/tlottie/*' -o -path '*/wallet-engine/*' ')' ! -path '*/target/*' ')' -o -perm +111 ')' -type f ')' -o '(' -empty ! -path '*/tlottie/*' ! -path '*/wallet-engine/*' ')' ')' -delete
+
+      # The combined cache step saves only when the whole job succeeds, which
+      # would lose hours of libraries to a later failure.
+      - name: Save Libraries cache.
+        if: steps.cache-libs.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            Libraries
+            ThirdParty
+          key: ${{ runner.OS }}-libs-v3-${{ env.REPO_NAME }}-${{ hashFiles(format('{0}/{1}', env.REPO_NAME, env.PREPARE_PATH)) }}
+
+      - name: NoxGram build.
+        if: env.ONLY_CACHE == 'false'
+        env:
+          NAGRAM_API_ID: ${{ secrets.NOXGRAM_API_ID }}
+          NAGRAM_API_HASH: ${{ secrets.NOXGRAM_API_HASH }}
+        run: |
+          cd $REPO_NAME/Telegram
+
+          # Without the repository secrets, build with the test-only credentials.
+          API=""
+          if [ -z "$NAGRAM_API_ID" ]; then
+            API="-D TDESKTOP_API_TEST=ON"
+          fi
+
+          DEFINE=""
+          if [ -n "${{ matrix.defines }}" ]; then
+            DEFINE="-D ${{ matrix.defines }}=ON"
+            echo Define from matrix: $DEFINE
+            echo "ARTIFACT_NAME=NoxGram ${{ matrix.defines }}" >> $GITHUB_ENV
+          else
+            echo "ARTIFACT_NAME=NoxGram" >> $GITHUB_ENV
+          fi
+
+          ./configure.sh \
+          -D CMAKE_CONFIGURATION_TYPES=$CONFIG \
+          -D CMAKE_COMPILE_WARNING_AS_ERROR=OFF \
+          -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO \
+          -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON \
+          $API \
+          $DEFINE
+
+          cmake --build ../out --config $CONFIG --parallel
+
+      - name: Move artifact.
+        run: |
+          cd $REPO_NAME/out/$CONFIG
+          mkdir artifact
+          strip "NoxGram Desktop.app/Contents/MacOS/NoxGram Desktop"
+          # Unsigned: an ad-hoc signature lets it start after
+          # "Open" in the Finder context menu.
+          codesign --force --deep --sign - "NoxGram Desktop.app"
+          # An artifact keeps neither the executable bits nor the links
+          # of a bundle, the archive does.
+          ditto -c -k --keepParent "NoxGram Desktop.app" artifact/NoxGram-macos.zip
+          echo "ARTIFACT_NAME=NoxGram-macos" >> $GITHUB_ENV
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: env.UPLOAD_ARTIFACT == 'true'
+        name: Upload artifact.
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.REPO_NAME }}/out/${{ env.CONFIG }}/artifact/
+          retention-days: 30
+
