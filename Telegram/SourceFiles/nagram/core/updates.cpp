@@ -36,7 +36,7 @@ std::atomic<Follows> FollowsCiValue = Follows::Unknown;
 } // namespace
 
 QString ReleasesUrl() {
-	return u"https://github.com/levitskyyy/NoxGram/releases"_q;
+	return u"https://gitlab.com/levitskyyy/NoxGram/-/releases"_q;
 }
 
 QString DownloadPrefix() {

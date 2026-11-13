@@ -87,8 +87,8 @@ The internal CMake target is still `Telegram` and the Nagram code keeps its
 `Nagram` namespaces and `nagram.*` setting keys, which keeps merging upstream
 Nagram changes simple. NoxGram's own code lives in `Telegram/SourceFiles/noxgram/`.
 
-- [Source](https://github.com/levitskyyy/NoxGram) ·
-  [Releases](https://github.com/levitskyyy/NoxGram/releases)
+- [Source](https://gitlab.com/levitskyyy/NoxGram) ·
+  [Releases](https://gitlab.com/levitskyyy/NoxGram/-/releases)
 - [Brand assets and application identity](BRANDING.md)
 - Nagram's own documentation is kept in [docs/nagram](docs/nagram/).
 

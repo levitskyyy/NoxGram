@@ -25,7 +25,7 @@ Application identity:
 - Portable directory: `NoxGramForcePortable`.
 - Telegram `tg:` and `tonsite:` protocol compatibility is retained.
 
-Release links point to https://github.com/levitskyyy/NoxGram. Update packages
+Release links point to https://gitlab.com/levitskyyy/NoxGram. Update packages
 are still verified with the Nagram keys in `Telegram/Resources/nagram/update`;
 replace them with NoxGram keys before publishing updates, or build with
 `DESKTOP_APP_DISABLE_AUTOUPDATE=ON`.
