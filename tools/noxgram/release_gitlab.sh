@@ -1,33 +1,28 @@
 #!/usr/bin/env bash
 # Publish a NoxGram release on GitLab from this Mac.
 #
-# Usage: tools/noxgram/release_gitlab.sh <tag> [file...]
+# Usage: tools/noxgram/release_gitlab.sh [<tag>] [file...]
 #
-# Builds the universal (Apple Silicon + Intel) Release app in out/, signs it
-# (ad hoc unless the Developer ID variables of tools/nagram/sign_macos.sh are
-# set), packs NoxGram-macos.dmg, tags HEAD with <tag> and pushes the tag to
-# the `gitlab` remote, uploads the image and every other given file (the
-# Linux and Windows executables) to the generic package registry and
-# creates the release with links to them; NOXGRAM_RELEASE_NOTES is added to
-# the notes. Needs glab logged in to
-# gitlab.com and the libraries of Telegram/build/prepare/mac.sh.
+# Without a tag the next one is taken: v<app version>-nox.<N + 1>. Builds the
+# universal (Apple Silicon + Intel) Release app in out/, signs it (ad hoc
+# unless the Developer ID variables of tools/nagram/sign_macos.sh are set),
+# packs NoxGram-macos.dmg, pushes the current branch and the new tag to the
+# `gitlab` remote, uploads the image and every given file (Linux and Windows
+# executables) to the generic package registry and creates the release with
+# links to them. The notes list the commits since the previous release;
+# NOXGRAM_RELEASE_NOTES is added to them. Needs glab logged in to gitlab.com
+# and the libraries of Telegram/build/prepare/mac.sh.
 set -euo pipefail
 
-if [ $# -lt 1 ]; then
-	echo "Usage: $0 <tag> [file...]" >&2
-	exit 2
+tag=""
+if [ $# -gt 0 ] && [ "${1#v}" != "$1" ] && [ ! -f "$1" ]; then
+	tag=$1
+	shift
 fi
-tag=$1
-shift
-case "$tag" in
-	v*) ;;
-	*) echo "The tag must start with v, like v7.4.1-nox.2." >&2; exit 2 ;;
-esac
 
 root=$(cd "$(dirname "$0")/../.." && pwd)
 project="levitskyyy/NoxGram"
 encoded="levitskyyy%2FNoxGram"
-version=${tag#v}
 remote=gitlab
 helper='credential.https://gitlab.com.helper=!glab auth git-credential'
 app_name="NoxGram Desktop.app"
@@ -38,6 +33,21 @@ for file in "$@"; do
 done
 glab auth status --hostname gitlab.com > /dev/null 2>&1 \
 	|| { echo "Log in first: glab auth login" >&2; exit 1; }
+if ! git -C "$root" diff --quiet HEAD -- ; then
+	echo "Commit your changes first: the release is built from HEAD." >&2
+	exit 1
+fi
+
+previous=$(git -C "$root" describe --tags --abbrev=0 --match 'v*-nox.*' \
+	2> /dev/null || true)
+if [ -z "$tag" ]; then
+	base=$(sed -n 's/^AppVersionStr[[:space:]]\{1,\}//p' "$root/Telegram/build/version")
+	last=$(git -C "$root" tag --list "v$base-nox.*" \
+		| sed "s/^v$base-nox\.//" | sort -n | tail -n 1)
+	tag="v$base-nox.$(( ${last:-0} + 1 ))"
+fi
+version=${tag#v}
+echo "Releasing $tag..."
 
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
@@ -68,7 +78,7 @@ echo "Tagging $tag..."
 if ! git -C "$root" rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
 	git -C "$root" tag "$tag"
 fi
-git -C "$root" -c "$helper" push -q "$remote" "refs/tags/$tag"
+git -C "$root" -c "$helper" push -q "$remote" HEAD "refs/tags/$tag"
 
 echo "Uploading..."
 links="["
@@ -88,6 +98,16 @@ notes="NoxGram $version.
 - macOS: open NoxGram-macos.dmg and drag NoxGram to Applications. The app is not notarized: on the first start macOS refuses it, then open System Settings → Privacy & Security → Open Anyway.
 - Windows: run the .exe.
 - Linux: chmod +x and run the file."
+if [ -n "$previous" ] && [ "$previous" != "$tag" ]; then
+	changes=$(git -C "$root" log --no-merges --format='- %s' "$previous..$tag" \
+		| sed 's/ \[[a-z]*-only\]//g')
+	if [ -n "$changes" ]; then
+		notes="$notes
+
+Changes since ${previous#v}:
+$changes"
+	fi
+fi
 if [ -n "${NOXGRAM_RELEASE_NOTES:-}" ]; then
 	notes="$notes
 
