@@ -29,6 +29,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_polls.h"
 #include "ui/toast/toast.h"
 #include "window/window_session_controller.h"
+#include "noxgram/ghost.h"
 
 namespace {
 
@@ -328,6 +329,7 @@ void Polls::sendVotes(
 		options,
 		ranges::back_inserter(prepared),
 		[](const QByteArray &option) { return MTP_bytes(option); });
+	Nox::Ghost::MarkReadAfterAction(item->history());
 	const auto requestId = _api.request(MTPmessages_SendVote(
 		peer->input(),
 		MTP_int(item->id),

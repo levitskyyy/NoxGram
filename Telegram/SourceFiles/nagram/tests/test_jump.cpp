@@ -87,5 +87,5 @@ void TestJump() {
 		&& !ParseJumpLink(QString()),
 		"jump opens nothing but message links");
 
-	std::cout << "PASS: Nagram jump to message" << std::endl;
+	std::cout << "PASS: NoxGram jump to message" << std::endl;
 }

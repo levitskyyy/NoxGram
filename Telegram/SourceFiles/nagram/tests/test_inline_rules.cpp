@@ -319,5 +319,5 @@ void TestInlineRules() {
 	TestValidation();
 	TestBudget();
 	TestImport();
-	std::cout << "PASS: Nagram inline bot rules" << std::endl;
+	std::cout << "PASS: NoxGram inline bot rules" << std::endl;
 }

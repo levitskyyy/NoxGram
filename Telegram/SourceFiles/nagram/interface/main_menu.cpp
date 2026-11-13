@@ -43,7 +43,7 @@ std::optional<QJsonObject> MainMenu() {
 	}
 	const auto document = QJsonDocument::fromJson(bytes);
 	if (!document.isObject() || !ValidMainMenu(document.object())) {
-		LOG(("Nagram Error: Invalid mainMenu configuration; native menu retained."));
+		LOG(("NoxGram Error: Invalid mainMenu configuration; native menu retained."));
 		return std::nullopt;
 	}
 	return document.object();

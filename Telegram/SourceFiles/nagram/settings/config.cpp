@@ -87,7 +87,7 @@ Settings::Type CategorySection(Category category) {
 	case Category::Rules: return RulesId();
 	case Category::Network: return NetworkId();
 	}
-	Unexpected("Invalid Nagram option category.");
+	Unexpected("Invalid NoxGram option category.");
 }
 
 void AddText(not_null<Ui::GenericBox*> box, const QString &text) {

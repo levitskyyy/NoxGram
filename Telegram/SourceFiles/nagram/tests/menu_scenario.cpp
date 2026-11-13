@@ -406,7 +406,7 @@ void AppendMenuScenario(not_null<Test::Runner*> runner) {
 						Menu::ActionId::RepeatAsCopy,
 						Menu::ActionId::ForwardWithoutQuote }) {
 					Test::Check(HasAction(state->menu, id),
-						u"configured Nagram message action is present"_q,
+						u"configured NoxGram message action is present"_q,
 						u"id=%1"_q.arg(static_cast<int>(id)));
 				}
 				for (auto value = int(Menu::ActionId::Batch);
@@ -445,7 +445,7 @@ void AppendMenuScenario(not_null<Test::Runner*> runner) {
 				}
 				if (state->field) {
 					if (state->field->empty()) {
-						state->field->setText(u"Nagram menu probe"_q);
+						state->field->setText(u"NoxGram menu probe"_q);
 						state->changedDraft = true;
 					}
 					SendContextMenu(state->field, state->field->rect().center());

@@ -1,0 +1,35 @@
+/*
+NoxGram: русский перевод.
+*/
+
+"lng_nagram_settings" = "NoxGram";
+"lng_nox_ghost_spy" = "Гостмод и спай-мод";
+"lng_nox_ghost_title" = "Гостмод";
+"lng_nox_ghost_mode" = "Режим призрака";
+"lng_nox_ghost_mode_about" = "Пока режим призрака включён, выбранное ниже не отправляется в Telegram. Его можно быстро переключить в главном меню.";
+"lng_nox_ghost_hide_read" = "Не отправлять отметки о прочтении";
+"lng_nox_ghost_hide_stories" = "Не отмечать истории просмотренными";
+"lng_nox_ghost_hide_online" = "Не отправлять статус «в сети»";
+"lng_nox_ghost_hide_typing" = "Не отправлять статус набора и загрузки";
+"lng_nox_ghost_offline_after_online" = "Уходить офлайн после действий";
+"lng_nox_ghost_offline_after_online_about" = "Отправка сообщения, реакции или голоса показывает вас в сети. NoxGram сразу после этого отправляет статус «не в сети».";
+"lng_nox_ghost_read_on_action" = "Читать чат при ответе";
+"lng_nox_ghost_read_on_action_about" = "Когда вы что-то отправляете в чат, он отмечается прочитанным, чтобы ваш ответ не висел рядом с непрочитанными сообщениями.";
+"lng_nox_ghost_schedule_send" = "Отправлять текст как отложенные";
+"lng_nox_ghost_schedule_send_about" = "Текстовые сообщения планируются примерно на 12 секунд вперёд, поэтому отправка не показывает вас в сети.";
+"lng_nox_ghost_menu_toggle" = "Переключатель в главном меню";
+
+"lng_nox_spy_title" = "Спай-мод";
+"lng_nox_save_deleted" = "Сохранять удалённые сообщения";
+"lng_nox_save_edits" = "Сохранять историю изменений";
+"lng_nox_keep_self_destructing" = "Сохранять самоуничтожающиеся сообщения";
+"lng_nox_save_for_bots" = "Также в чатах с ботами";
+"lng_nox_spy_about" = "Сообщения, удалённые собеседником, остаются в чате с пометкой «удалено» до перезапуска. Их текст и прошлые версии изменённых сообщений сохраняются только на этом устройстве, в папке tdata, и открываются из меню чата и меню сообщения.";
+"lng_nox_deleted_mark" = "удалено";
+"lng_nox_spy_edit_history" = "История изменений";
+"lng_nox_spy_current_version" = "Текущая версия";
+"lng_nox_spy_deleted_messages" = "Удалённые сообщения";
+"lng_nox_spy_deleted_none" = "В этом чате нет сохранённых удалённых сообщений.";
+"lng_nox_spy_deleted_at" = "удалено {date}";
+"lng_nox_spy_empty_text" = "(без текста)";
+"lng_nox_spy_clear" = "Очистить";

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component type="desktop">
-    <id>xyz.nextalone.nagram.desktop</id>
+    <id>app.noxgram.desktop</id>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>GPL-3.0</project_license>
     <name>Nagram</name>
     <summary>New era of messaging</summary>
     <description>
-        <p>Nagram Desktop is an independent Telegram client based on Telegram Desktop, with the Nagram visual identity.</p>
+        <p>NoxGram Desktop is an independent Telegram client based on Telegram Desktop, with the Nagram visual identity.</p>
         <p>Chat, share media, and manage your Telegram accounts. Nagram enhancements are being introduced incrementally.</p>
     </description>
     <categories>
         <category>Network</category>
         <category>InstantMessaging</category>
     </categories>
-    <developer id="xyz.nextalone"><name>NextAlone and Nagram contributors</name></developer>
-    <url type="homepage">https://github.com/NextAlone/Nagram-qt/</url>
+    <developer id="xyz.nextalone"><name>NoxGram contributors</name></developer>
+    <url type="homepage">https://github.com/levitskyyy/NoxGram/</url>
     <url type="faq">https://telegram.org/faq</url>
-    <url type="bugtracker">https://github.com/NextAlone/Nagram-qt/issues</url>
+    <url type="bugtracker">https://github.com/levitskyyy/NoxGram/issues</url>
     <url type="translate">https://translations.telegram.org/</url>
-    <url type="vcs-browser">https://github.com/NextAlone/Nagram-qt</url>
-    <url type="contribute">https://github.com/NextAlone/Nagram-qt/blob/main/.github/CONTRIBUTING.md</url>
+    <url type="vcs-browser">https://github.com/levitskyyy/NoxGram</url>
+    <url type="contribute">https://github.com/levitskyyy/NoxGram/blob/main/.github/CONTRIBUTING.md</url>
     <branding>
         <color type="primary" scheme_preference="light">#edf0f2</color>
         <color type="primary" scheme_preference="dark">#2d363f</color>
@@ -75,10 +75,10 @@
         <content_attribute id="money-gambling">none</content_attribute>
         <content_attribute id="money-advertising">moderate</content_attribute>
     </content_rating>
-    <launchable type="desktop-id">xyz.nextalone.nagram.desktop.desktop</launchable>
+    <launchable type="desktop-id">app.noxgram.desktop.desktop</launchable>
     <provides>
         <binary>Nagram</binary>
-        <dbus type="session">xyz.nextalone.nagram.desktop</dbus>
+        <dbus type="session">app.noxgram.desktop</dbus>
         <mediatype>x-scheme-handler/tg</mediatype>
         <mediatype>x-scheme-handler/tonsite</mediatype>
         <mediatype>x-scheme-handler/ton</mediatype>

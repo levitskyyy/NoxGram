@@ -322,5 +322,5 @@ void TestChatTranslation() {
 	TestQueue();
 	TestThrottle();
 	TestPageBatches();
-	std::cout << "PASS: Nagram whole-chat translation batches" << std::endl;
+	std::cout << "PASS: NoxGram whole-chat translation batches" << std::endl;
 }

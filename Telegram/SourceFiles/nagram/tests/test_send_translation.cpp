@@ -80,5 +80,5 @@ void TestSendTranslation() {
 		&& kChats.scope == Scope::Account
 		&& !registry.HasFlag(kChats.key, Flag::Exportable),
 		"send translation option scopes");
-	std::cout << "PASS: Nagram translation before sending" << std::endl;
+	std::cout << "PASS: NoxGram translation before sending" << std::endl;
 }

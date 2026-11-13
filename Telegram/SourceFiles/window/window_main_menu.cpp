@@ -87,6 +87,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QClipboard>
+#include "noxgram/ghost.h"
+#include "noxgram/options.h"
 
 namespace Window {
 namespace {
@@ -394,8 +396,8 @@ MainMenu::MainMenu(
 	parentResized();
 
 	_telegram->setMarkedText(tr::link(
-		u"Nagram Desktop"_q,
-		u"https://github.com/NextAlone/Nagram-qt"_q));
+		u"NoxGram Desktop"_q,
+		u"https://github.com/levitskyyy/NoxGram"_q));
 	_telegram->setLinksTrusted();
 	// The canary version is too long for the "Version {version}" form.
 	_version->setMarkedText(
@@ -789,6 +791,19 @@ void MainMenu::setupMenu() {
 		)->setClickedCallback([=] {
 			_controller->session().supportTemplates().reload();
 		});
+	}
+	if (Nagram::ForDevice().Get(Nox::kGhostMenuToggle)) {
+		// NoxGram: quick ghost mode switch.
+		const auto ghost = addAction(
+			tr::lng_nox_ghost_mode(),
+			{ &st::menuIconStealth });
+		ghost->toggleOn(Nox::Ghost::ActiveValue());
+		ghost->toggledChanges(
+		) | rpl::filter([](bool active) {
+			return (active != Nox::Ghost::Active());
+		}) | rpl::on_next([](bool active) {
+			Nox::Ghost::SetActive(active);
+		}, ghost->lifetime());
 	}
 	addAction(
 		tr::lng_menu_settings(),

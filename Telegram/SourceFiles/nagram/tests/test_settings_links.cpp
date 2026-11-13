@@ -55,5 +55,5 @@ void TestSettingsLinks() {
 	Require(SettingsLinkToLocal(u"durov/nasettings").isEmpty(), "other path");
 	Require(SettingsLinkToLocal(u"").isEmpty(), "empty");
 
-	std::cout << "PASS: Nagram settings links\n";
+	std::cout << "PASS: NoxGram settings links\n";
 }

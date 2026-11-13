@@ -36,7 +36,7 @@ std::atomic<Follows> FollowsCiValue = Follows::Unknown;
 } // namespace
 
 QString ReleasesUrl() {
-	return u"https://github.com/NextAlone/Nagram-qt/releases"_q;
+	return u"https://github.com/levitskyyy/NoxGram/releases"_q;
 }
 
 QString DownloadPrefix() {

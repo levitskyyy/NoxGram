@@ -72,7 +72,7 @@ void UpdateShortcut(const QString &path, const QString &icon) {
 	}
 	if (!SUCCEEDED(shellLink->SetIconLocation(icon.toStdWString().c_str(), 0))
 		|| !SUCCEEDED(persistFile->Save(native.c_str(), TRUE))) {
-		LOG(("Nagram Error: Could not set the icon of \"%1\"").arg(path));
+		LOG(("NoxGram Error: Could not set the icon of \"%1\"").arg(path));
 		return;
 	}
 	if (Dlls::SHChangeNotify) {
@@ -99,14 +99,14 @@ void SetShortcutsIcon(const QString &id, const QImage &image) {
 
 	const auto icon = image.isNull() ? QString() : WriteIcon(id, image);
 	if (icon.isEmpty() != image.isNull()) {
-		LOG(("Nagram Error: Could not write the icon \"%1\"").arg(id));
+		LOG(("NoxGram Error: Could not write the icon \"%1\"").arg(id));
 		return;
 	}
 	const auto programs = appData
 		+ u"/Microsoft/Windows/Start Menu/Programs/"_q;
-	UpdateShortcut(programs + u"Nagram.lnk"_q, icon);
-	UpdateShortcut(programs + u"NagramAlpha.lnk"_q, icon);
-	UpdateShortcut(programs + u"Nagram Desktop/Nagram.lnk"_q, icon);
+	UpdateShortcut(programs + u"NoxGram.lnk"_q, icon);
+	UpdateShortcut(programs + u"NoxGramAlpha.lnk"_q, icon);
+	UpdateShortcut(programs + u"NoxGram Desktop/NoxGram.lnk"_q, icon);
 
 	const auto pinned = QDir(appData
 		+ u"/Microsoft/Internet Explorer/Quick Launch/User Pinned/TaskBar"_q);

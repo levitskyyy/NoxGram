@@ -56,5 +56,5 @@ void TestSearchTerms() {
 	Require(pairs.size() == 2, "one term per code point");
 	Require(pairs[1] == rare.mid(2), "suffix starts at a code point");
 
-	std::cout << "PASS: Nagram settings search terms\n";
+	std::cout << "PASS: NoxGram settings search terms\n";
 }

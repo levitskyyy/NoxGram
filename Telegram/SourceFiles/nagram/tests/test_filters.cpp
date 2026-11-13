@@ -80,5 +80,5 @@ void TestFilters() {
 		&& mixed.text.text.startsWith(u"bar "_q)
 		&& mixed.error.contains(u"regex work limit"_q),
 		"a rule over its regex budget discarded the other rules");
-	std::cout << "PASS: Nagram filter budgets and projection" << std::endl;
+	std::cout << "PASS: NoxGram filter budgets and projection" << std::endl;
 }

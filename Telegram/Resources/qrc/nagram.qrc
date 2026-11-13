@@ -2,6 +2,7 @@
   <qresource prefix="/langs/nagram">
     <file alias="zh-hans.strings">../langs/nagram/zh-hans.strings</file>
     <file alias="zh-hant.strings">../langs/nagram/zh-hant.strings</file>
+    <file alias="ru.strings">../langs/nagram/noxgram_ru.strings</file>
   </qresource>
   <qresource prefix="/nagram/icons">
     <file alias="block.png">../nagram/icons/block.png</file>

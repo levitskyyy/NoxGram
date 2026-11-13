@@ -203,15 +203,15 @@ int main() {
 		const auto upstream = ReadStrings(root + "/lang.strings", false);
 		const auto english = ReadStrings(root + "/nagram/nagram.strings", true);
 		if (english.empty()) {
-			throw std::runtime_error("Nagram English strings are empty");
+			throw std::runtime_error("NoxGram English strings are empty");
 		}
 		for (const auto &entry : english) {
 			const auto &key = entry.first;
 			if (!key.starts_with("lng_nagram_")) {
-				throw std::runtime_error("Invalid Nagram key prefix: " + key);
+				throw std::runtime_error("Invalid NoxGram key prefix: " + key);
 			}
 			if (key.ends_with("#one") || key.ends_with("#other")) {
-				throw std::runtime_error("Nagram plural key is unsupported: " + key);
+				throw std::runtime_error("NoxGram plural key is unsupported: " + key);
 			}
 			if (upstream.contains(key)) {
 				throw std::runtime_error("Key collides with upstream: " + key);
@@ -236,7 +236,7 @@ int main() {
 				}
 			}
 		}
-		std::cout << "PASS: Nagram strings (" << english.size()
+		std::cout << "PASS: NoxGram strings (" << english.size()
 			<< " English keys)" << std::endl;
 		return 0;
 	} catch (const std::exception &error) {

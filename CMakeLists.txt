@@ -19,8 +19,8 @@ endif()
 project(Telegram
     LANGUAGES C CXX
     VERSION ${desktop_app_version_cmake}
-    DESCRIPTION "Nagram Desktop messenger"
-    HOMEPAGE_URL "https://github.com/NextAlone/Nagram-qt"
+    DESCRIPTION "NoxGram Desktop messenger"
+    HOMEPAGE_URL "https://github.com/levitskyyy/NoxGram"
 )
 
 if (APPLE)

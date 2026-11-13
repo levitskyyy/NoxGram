@@ -49,7 +49,7 @@ std::optional<QString> ConvertCharacter(char32_t value, bool traditional) {
 #ifdef Q_OS_MAC
 	const auto string = CFStringCreateMutable(nullptr, 0);
 	if (!string) {
-		LOG(("Nagram Chinese conversion: CFStringCreateMutable failed."));
+		LOG(("NoxGram Chinese conversion: CFStringCreateMutable failed."));
 		return std::nullopt;
 	}
 	CFStringAppendCharacters(string,
@@ -57,7 +57,7 @@ std::optional<QString> ConvertCharacter(char32_t value, bool traditional) {
 	const auto ok = CFStringTransform(string, nullptr,
 		CFSTR("Traditional-Simplified"), traditional);
 	if (!ok) {
-		LOG(("Nagram Chinese conversion: CFStringTransform failed for U+%1."
+		LOG(("NoxGram Chinese conversion: CFStringTransform failed for U+%1."
 			).arg(QString::number(value, 16)));
 		CFRelease(string);
 		return std::nullopt;
@@ -67,7 +67,7 @@ std::optional<QString> ConvertCharacter(char32_t value, bool traditional) {
 		reinterpret_cast<UniChar*>(output.data()));
 	CFRelease(string);
 	if (output.isEmpty()) {
-		LOG(("Nagram Chinese conversion: CFStringTransform returned empty text."));
+		LOG(("NoxGram Chinese conversion: CFStringTransform returned empty text."));
 		return std::nullopt;
 	}
 	return output;
@@ -78,7 +78,7 @@ std::optional<QString> ConvertCharacter(char32_t value, bool traditional) {
 	const auto length = LCMapStringEx(L"zh-CN", flags, source, input.size(),
 		nullptr, 0, nullptr, nullptr, 0);
 	if (!length) {
-		LOG(("Nagram Chinese conversion: LCMapStringEx size failed: %1."
+		LOG(("NoxGram Chinese conversion: LCMapStringEx size failed: %1."
 			).arg(GetLastError()));
 		return std::nullopt;
 	}
@@ -87,17 +87,17 @@ std::optional<QString> ConvertCharacter(char32_t value, bool traditional) {
 		reinterpret_cast<LPWSTR>(output.data()), length,
 		nullptr, nullptr, 0);
 	if (written != length) {
-		LOG(("Nagram Chinese conversion: LCMapStringEx map failed: %1."
+		LOG(("NoxGram Chinese conversion: LCMapStringEx map failed: %1."
 			).arg(GetLastError()));
 		return std::nullopt;
 	}
 	if (output.isEmpty()) {
-		LOG(("Nagram Chinese conversion: LCMapStringEx returned empty text."));
+		LOG(("NoxGram Chinese conversion: LCMapStringEx returned empty text."));
 		return std::nullopt;
 	}
 	return output;
 #else
-	LOG(("Nagram Chinese conversion: unsupported platform."));
+	LOG(("NoxGram Chinese conversion: unsupported platform."));
 	return std::nullopt;
 #endif
 }
@@ -109,7 +109,7 @@ std::optional<TextWithEntities> ConvertChinese(
 		bool traditional,
 		std::vector<int> *mapped) {
 	if (!ChineseConversionAvailable()) {
-		LOG(("Nagram Chinese conversion: unsupported platform."));
+		LOG(("NoxGram Chinese conversion: unsupported platform."));
 		return std::nullopt;
 	}
 	const auto length = int(source.text.size());
@@ -130,7 +130,7 @@ std::optional<TextWithEntities> ConvertChinese(
 		|| !protect(TextUtilities::ParseEntities(source.text,
 			TextParseLinks | TextParseMentions | TextParseHashtags
 				| TextParseBotCommands).entities)) {
-		LOG(("Nagram Chinese conversion: invalid text entity range."));
+		LOG(("NoxGram Chinese conversion: invalid text entity range."));
 		return std::nullopt;
 	}
 	auto codeStart = -1;

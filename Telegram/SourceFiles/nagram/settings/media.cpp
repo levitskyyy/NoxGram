@@ -221,7 +221,7 @@ QString ExportNamingLabel(int value) {
 		return tr::lng_nagram_sticker_export_dir_title(tr::now);
 	case Naming::Id: return tr::lng_nagram_sticker_export_dir_id(tr::now);
 	}
-	Unexpected("Invalid Nagram sticker export naming.");
+	Unexpected("Invalid NoxGram sticker export naming.");
 }
 
 void ExportNamingBox(not_null<Ui::GenericBox*> box) {

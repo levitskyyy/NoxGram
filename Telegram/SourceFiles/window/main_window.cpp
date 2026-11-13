@@ -912,7 +912,7 @@ void MainWindow::updateTitle() {
 
 	const auto suffix = nativeTitleSuffix();
 	if (Nagram::Privacy::DemoMode()) {
-		setTitle(u"Nagram"_q + suffix);
+		setTitle(u"NoxGram"_q + suffix);
 		return;
 	}
 	const auto settings = Core::App().settings().windowTitleContent();
@@ -940,7 +940,7 @@ void MainWindow::updateTitle() {
 		: Dialogs::Key();
 	const auto thread = key ? key.thread() : nullptr;
 	if (!thread) {
-		setTitle((user.isEmpty() ? u"Nagram"_q : user) + added + suffix);
+		setTitle((user.isEmpty() ? u"NoxGram"_q : user) + added + suffix);
 		return;
 	}
 	const auto history = thread->owningHistory();

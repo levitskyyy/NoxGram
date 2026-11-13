@@ -151,6 +151,6 @@ void TestLinks() {
 	Require(!Rewrite(raw, u"http://name:password@example.com/p"_q).error.isEmpty(),
 		"credential-bearing URL was rewritten");
 	TestWebviewPattern();
-	std::cout << "PASS: Nagram link rules and web app link pattern"
+	std::cout << "PASS: NoxGram link rules and web app link pattern"
 		<< std::endl;
 }

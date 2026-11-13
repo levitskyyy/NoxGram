@@ -113,6 +113,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/file_upload.h"
 #include "storage/storage_account.h"
 #include "tgw/tgw_storage.h"
+#include "noxgram/ghost.h"
 
 namespace {
 
@@ -1471,8 +1472,15 @@ void ApiWrap::markContentsRead(
 		not_null<ChannelData*>,
 		QVector<MTPint>>();
 	markedIds.reserve(items.size());
+	const auto sendRead = Nox::Ghost::SendReadMessages();
 	for (const auto &item : items) {
+		// Mentions and reactions are still cleared on the server, otherwise
+		// they keep coming back; voice and video contents stay unread.
+		const auto passthrough = (item->isUnreadMention()
+			|| item->hasUnreadReaction()) && !item->isUnreadMedia();
 		if (!item->markContentsRead(true) || !item->isRegular()) {
+			continue;
+		} else if (!sendRead && !passthrough) {
 			continue;
 		}
 		if (const auto channel = item->history()->peer->asChannel()) {
@@ -1497,7 +1505,11 @@ void ApiWrap::markContentsRead(
 }
 
 void ApiWrap::markContentsRead(not_null<HistoryItem*> item) {
+	const auto passthrough = (item->isUnreadMention()
+		|| item->hasUnreadReaction()) && !item->isUnreadMedia();
 	if (!item->markContentsRead(true) || !item->isRegular()) {
+		return;
+	} else if (!Nox::Ghost::SendReadMessages() && !passthrough) {
 		return;
 	}
 	const auto ids = MTP_vector<MTPint>(1, MTP_int(item->id));
@@ -4487,6 +4499,7 @@ void ApiWrap::cancelLocalItem(not_null<HistoryItem*> item) {
 void ApiWrap::sendShortcutMessages(
 		not_null<PeerData*> peer,
 		BusinessShortcutId id) {
+	Nox::Ghost::MarkReadAfterAction(peer->owner().history(peer));
 	auto ids = QVector<MTPint>();
 	auto randomIds = QVector<MTPlong>();
 	request(MTPmessages_SendQuickReplyMessages(
@@ -4766,6 +4779,10 @@ void ApiWrap::sendRichMessage(
 void ApiWrap::sendMessage(
 		MessageToSend &&message,
 		std::optional<MsgId> localMessageId) {
+	if (!_session->ephemeralMessages().wouldSend(message)) {
+		// NoxGram ghost mode: send as scheduled so we don't appear online.
+		Nox::Ghost::ApplyScheduling(_session, message.action.options);
+	}
 	const auto history = message.action.history;
 	const auto peer = history->peer;
 	const auto &textWithTags = message.textWithTags;

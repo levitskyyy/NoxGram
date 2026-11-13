@@ -106,7 +106,7 @@ Resolved ResolveFor(
 	}
 	const auto result = Resolve(account, global, scopes, peer, topic);
 	if (!result.error.isEmpty()) {
-		LOG(("Nagram filter: %1 (chat %2, topic %3).")
+		LOG(("NoxGram filter: %1 (chat %2, topic %3).")
 			.arg(result.error, peer, topic));
 	}
 	cache.places.insert(place, result);
@@ -180,7 +180,7 @@ Result Project(HistoryItem *item, const TextWithEntities &source) {
 		.result = result,
 	});
 	if (!result.error.isEmpty()) {
-		LOG(("Nagram filter: %1 (message %2).")
+		LOG(("NoxGram filter: %1 (message %2).")
 			.arg(result.error, QString::number(item->id.bare)));
 	}
 	return result;

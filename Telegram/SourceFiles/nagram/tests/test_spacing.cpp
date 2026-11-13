@@ -59,5 +59,5 @@ void TestSpacing() {
 	Require(SourceRange(chained, 1, 3) == std::pair(1, 2)
 		&& ShownRange(chained, 1, 2) == std::pair(1, 3),
 		"a character shown as two maps as one");
-	std::cout << "PASS: Nagram spacing and offsets" << std::endl;
+	std::cout << "PASS: NoxGram spacing and offsets" << std::endl;
 }

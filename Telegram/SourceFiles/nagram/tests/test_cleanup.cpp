@@ -47,5 +47,5 @@ void TestCleanup() {
 	Require(Classify({ .lastActivity = 1 }, std::numeric_limits<TimeId>::max())
 			== Category::InactiveChat,
 		"cleanup period does not overflow");
-	std::cout << "PASS: Nagram chat cleanup" << std::endl;
+	std::cout << "PASS: NoxGram chat cleanup" << std::endl;
 }

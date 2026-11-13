@@ -348,5 +348,5 @@ void TestLocalFaved() {
 void TestLocalLists() {
 	TestLocalPins();
 	TestLocalFaved();
-	std::cout << "PASS: Nagram local lists" << std::endl;
+	std::cout << "PASS: NoxGram local lists" << std::endl;
 }

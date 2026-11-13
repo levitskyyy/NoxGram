@@ -87,7 +87,7 @@ void Watch(not_null<Main::Session*> session);
 		skipped += state.documents[i] ? 0 : 1;
 	}
 	if (skipped) {
-		LOG(("Nagram local favorites: %1 unreadable item(s) skipped."
+		LOG(("NoxGram local favorites: %1 unreadable item(s) skipped."
 			).arg(skipped));
 	}
 	crl::on_main(session, [=] { Watch(session); });

@@ -10,6 +10,7 @@
 #include "nagram/settings/services.h"
 #include "nagram/settings/rules.h"
 #include "nagram/settings/network.h"
+#include "noxgram/ghost_spy_settings.h"
 
 #include "boxes/about_box.h"
 #include "core/click_handler_types.h"
@@ -59,8 +60,14 @@ const auto kMeta = BuildHelper({
 		.title = tr::lng_nagram_source_code(),
 		.icon = { &st::menuIconLink },
 		.onClick = [] {
-			UrlClickHandler::Open(u"https://github.com/NextAlone/Nagram-qt"_q);
+			UrlClickHandler::Open(u"https://github.com/levitskyyy/NoxGram"_q);
 		},
+	});
+	builder.addSectionButton({
+		.title = tr::lng_nox_ghost_spy(),
+		.targetSection = Nox::GhostSpyId(),
+		.icon = { &st::menuIconStealth },
+		.keywords = { u"ghost"_q, u"spy"_q, u"deleted"_q, u"stealth"_q },
 	});
 	builder.addSectionButton({
 		.title = tr::lng_nagram_interface(),
@@ -144,7 +151,7 @@ void AddSettingsEntry(SectionBuilder &builder) {
 		.title = tr::lng_nagram_settings(),
 		.targetSection = Home::Id(),
 		.icon = { &st::menuIconNagram },
-		.keywords = { u"Nagram"_q, u"desktop"_q },
+		.keywords = { u"NoxGram"_q, u"desktop"_q },
 	});
 }
 

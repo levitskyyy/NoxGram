@@ -27,7 +27,7 @@ struct State {
 	if (!state.matched || state.text != text) {
 		const auto match = AutomaticInlineBot(true, state.matcher, text);
 		if (!match.error.isEmpty()) {
-			LOG(("Nagram inline bot: %1.").arg(match.error));
+			LOG(("NoxGram inline bot: %1.").arg(match.error));
 		}
 		state.text = text;
 		state.username = match.username;

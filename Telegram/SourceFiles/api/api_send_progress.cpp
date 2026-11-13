@@ -15,6 +15,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_peer_values.h"
 #include "apiwrap.h"
 #include "nagram/privacy/options.h"
+#include "noxgram/ghost.h"
 
 namespace Api {
 namespace {
@@ -153,7 +154,7 @@ void SendProgressManager::send(const Key &key, int progress) {
 }
 
 bool SendProgressManager::skipRequest(const Key &key) const {
-	if (Nagram::Privacy::HideSendStatus()
+	if ((Nagram::Privacy::HideSendStatus() || !Nox::Ghost::SendTyping())
 		&& key.type != SendProgressType::Speaking) {
 		return true;
 	}

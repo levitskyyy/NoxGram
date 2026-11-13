@@ -24,6 +24,7 @@
 #include "nagram/snapshot/snapshot.h"
 #include "nagram/sync/model.h"
 #include "nagram/core/diagnostics.h"
+#include "noxgram/options.h"
 
 #include "core/application.h"
 #include "core/core_settings.h"
@@ -142,6 +143,7 @@ const Registry &RegisteredOptions() {
 		SendTranslation::RegisterOptions(result);
 		RegisterDiagnosticsOptions(result);
 		Sync::RegisterOptions(result);
+		Nox::RegisterOptions(result);
 		return result;
 	}();
 	return registry;

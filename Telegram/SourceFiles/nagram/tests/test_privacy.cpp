@@ -151,5 +151,5 @@ void TestPrivacy() {
 	Require(options.Set(Privacy::kDoNotSharePhone, true)
 		&& options.Get(Privacy::kDoNotSharePhone),
 		"phone number sharing must start unticked when enabled");
-	std::cout << "PASS: Nagram content protection" << std::endl;
+	std::cout << "PASS: NoxGram content protection" << std::endl;
 }

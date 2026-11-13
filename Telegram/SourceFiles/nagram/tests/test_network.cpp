@@ -374,5 +374,5 @@ void TestNetwork() {
 	TestTransferOptions();
 	TestDownloadParams();
 	TestUploadPartSize();
-	std::cout << "PASS: Nagram network options" << std::endl;
+	std::cout << "PASS: NoxGram network options" << std::endl;
 }

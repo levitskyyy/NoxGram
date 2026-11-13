@@ -78,6 +78,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/boxes/confirm_box.h"
 #include "apiwrap.h"
 #include "ui/text/format_values.h" // Ui::FormatPhone
+#include "noxgram/ghost.h"
 
 namespace Api {
 namespace {
@@ -1001,7 +1002,9 @@ void Updates::updateOnline(crl::time lastNonIdleTime, bool gotOtherOffline) {
 	});
 
 	const auto &config = _session->serverConfig();
-	bool isOnline = Core::App().hasActiveWindow(&session());
+	// NoxGram ghost mode: never report being online.
+	bool isOnline = Nox::Ghost::SendOnline()
+		&& Core::App().hasActiveWindow(&session());
 	int updateIn = config.onlineUpdatePeriod;
 	Assert(updateIn >= 0);
 	if (isOnline) {

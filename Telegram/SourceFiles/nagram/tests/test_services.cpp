@@ -30,13 +30,13 @@ void TestSecretService() {
 	Require(attributes.size() == 3
 		&& attributes[0] == std::pair<QByteArray, QByteArray>(
 			"xdg:schema",
-			"xyz.nextalone.nagram.desktop.Services")
+			"app.noxgram.desktop.Services")
 		&& attributes[1].first == "service"
-		&& attributes[1].second == "Nagram Desktop Services"
+		&& attributes[1].second == "NoxGram Desktop Services"
 		&& attributes[2].first == "account"
 		&& attributes[2].second == account.toUtf8(),
 		"Secret Service attributes");
-	Require(ItemLabel(account) == "Nagram Desktop Services/" + account.toUtf8(),
+	Require(ItemLabel(account) == "NoxGram Desktop Services/" + account.toUtf8(),
 		"Secret Service label");
 	Require(NoObject("/") && NoObject(QByteArray()), "Secret Service no object");
 	Require(!NoObject("/org/freedesktop/secrets/prompt/u1"),
@@ -61,7 +61,7 @@ void TestSecretService() {
 			"org.kde.kwallet.Error" }) {
 		Require(ErrorFromName(name) == CredentialError::Denied, name);
 	}
-	std::cout << "PASS: Nagram Secret Service mapping" << std::endl;
+	std::cout << "PASS: NoxGram Secret Service mapping" << std::endl;
 }
 
 QByteArray OpenAiReply(const QByteArray &content, const QByteArray &reason) {
@@ -151,7 +151,7 @@ void TestServicesV2(const Nagram::ServiceDefinition &service) {
 	Require(!ValidServices(config), "system summary accepted");
 	config.insert(u"summary"_q, 1);
 	Require(!ValidServices(config), "non-string summary accepted");
-	std::cout << "PASS: Nagram services config version 2" << std::endl;
+	std::cout << "PASS: NoxGram services config version 2" << std::endl;
 }
 
 void TestLlmProtocols(const Nagram::ServiceDefinition &service) {
@@ -240,7 +240,7 @@ void TestLlmProtocols(const Nagram::ServiceDefinition &service) {
 	Require(!accepts(R"({"a":"b"})", "stop"), "object accepted");
 	Require(!accepts("<think>[\"a\",\"b\"]", "stop"), "open think accepted");
 	Require(!accepts("```", "stop"), "empty fence accepted");
-	std::cout << "PASS: Nagram LLM protocols and tolerant parsing" << std::endl;
+	std::cout << "PASS: NoxGram LLM protocols and tolerant parsing" << std::endl;
 }
 
 void TestPresets() {
@@ -269,7 +269,7 @@ void TestPresets() {
 		anthropic += (service.protocol == u"anthropic"_q) ? 1 : 0;
 	}
 	Require(ids.size() == 18 && anthropic == 1, "preset list");
-	std::cout << "PASS: Nagram service presets" << std::endl;
+	std::cout << "PASS: NoxGram service presets" << std::endl;
 }
 
 void TestContext(const Nagram::ServiceDefinition &service) {
@@ -369,7 +369,7 @@ void TestContext(const Nagram::ServiceDefinition &service) {
 			OpenAiReply(R"(["first","second","Hi"])", "stop"),
 			1),
 		"translated context accepted");
-	std::cout << "PASS: Nagram translation context" << std::endl;
+	std::cout << "PASS: NoxGram translation context" << std::endl;
 }
 
 void TestSummary(const Nagram::ServiceDefinition &service) {
@@ -431,7 +431,7 @@ void TestSummary(const Nagram::ServiceDefinition &service) {
 	Require(!ParseSummaryResult(service, OpenAiReply(
 			QByteArray(kSummaryResultLength + 1, 'x'), "stop")),
 		"oversized summary accepted");
-	std::cout << "PASS: Nagram message summary" << std::endl;
+	std::cout << "PASS: NoxGram message summary" << std::endl;
 }
 
 void TestTranscriptionQueue() {
@@ -530,7 +530,7 @@ void TestTranscriptionQueue() {
 	Require(!queue.current() && queue.stopped() == Stop::Cancelled
 		&& queue.done() == 1 && queue.left() == 3,
 		"cancel loses finished results or keeps running");
-	std::cout << "PASS: Nagram batch transcription queue" << std::endl;
+	std::cout << "PASS: NoxGram batch transcription queue" << std::endl;
 }
 
 } // namespace
@@ -681,7 +681,7 @@ void TestServices() {
 	yandexTranscription.kind = ServiceKind::Transcription;
 	Require(!ParseService(SerializeService(yandexTranscription)),
 		"non-OpenAI transcription accepted");
-	std::cout << "PASS: Nagram service config and credential binding" << std::endl;
+	std::cout << "PASS: NoxGram service config and credential binding" << std::endl;
 	TestServicesV2(service);
 	TestLlmProtocols(service);
 	TestPresets();

@@ -36,7 +36,7 @@ public:
 			kCFStringEncodingUTF8,
 			false);
 		CFDictionarySetValue(_value, kSecClass, kSecClassGenericPassword);
-		CFDictionarySetValue(_value, kSecAttrService, CFSTR("Nagram Desktop Services"));
+		CFDictionarySetValue(_value, kSecAttrService, CFSTR("NoxGram Desktop Services"));
 		CFDictionarySetValue(_value, kSecAttrAccount, key);
 		CFDictionarySetValue(_value, kSecAttrSynchronizable, kCFBooleanFalse);
 		CFRelease(key);
@@ -92,7 +92,7 @@ CredentialResult ReadCredential(const QString &account) {
 	CFRelease(result);
 	return { .secret = std::move(secret) };
 #elif defined Q_OS_WIN
-	const auto target = u"Nagram Desktop Services/"_q + account;
+	const auto target = u"NoxGram Desktop Services/"_q + account;
 	auto credential = PCREDENTIALW(nullptr);
 	if (!CredReadW(reinterpret_cast<LPCWSTR>(target.utf16()), CRED_TYPE_GENERIC, 0, &credential)) {
 		return { .error = GetLastError() == ERROR_NOT_FOUND
@@ -131,7 +131,7 @@ CredentialError WriteCredential(const QString &account, const QByteArray &secret
 	CFRelease(data);
 	return Error(status);
 #elif defined Q_OS_WIN
-	const auto target = u"Nagram Desktop Services/"_q + account;
+	const auto target = u"NoxGram Desktop Services/"_q + account;
 	auto credential = CREDENTIALW{};
 	credential.Type = CRED_TYPE_GENERIC;
 	credential.TargetName = const_cast<LPWSTR>(reinterpret_cast<LPCWSTR>(target.utf16()));
@@ -153,7 +153,7 @@ CredentialError DeleteCredential(const QString &account) {
 	const auto status = SecItemDelete(query.get());
 	return status == errSecItemNotFound ? CredentialError::None : Error(status);
 #elif defined Q_OS_WIN
-	const auto target = u"Nagram Desktop Services/"_q + account;
+	const auto target = u"NoxGram Desktop Services/"_q + account;
 	return (CredDeleteW(reinterpret_cast<LPCWSTR>(target.utf16()), CRED_TYPE_GENERIC, 0)
 		|| GetLastError() == ERROR_NOT_FOUND)
 		? CredentialError::None : CredentialError::Denied;

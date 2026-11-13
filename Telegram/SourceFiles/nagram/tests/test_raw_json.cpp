@@ -95,5 +95,5 @@ void TestRawJson() {
 	Require(nan.has_value()
 		&& QJsonDocument::fromJson(nan->toUtf8()).object().value("v")
 			.toString() == "nan", "non-numeric double becomes a string");
-	std::cout << "PASS: Nagram raw message JSON\n";
+	std::cout << "PASS: NoxGram raw message JSON\n";
 }

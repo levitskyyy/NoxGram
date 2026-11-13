@@ -7,7 +7,7 @@ namespace Nagram {
 std::optional<QJsonObject> Services() {
 	const auto bytes = ForDevice().Get(kServicesConfig);
 	if (ForDevice().invalidKeys().contains(kServicesConfig.key)) {
-		LOG(("Nagram Error: Invalid services configuration; external services disabled."));
+		LOG(("NoxGram Error: Invalid services configuration; external services disabled."));
 		return std::nullopt;
 	}
 	if (bytes.isEmpty()) {
@@ -15,7 +15,7 @@ std::optional<QJsonObject> Services() {
 	}
 	const auto document = QJsonDocument::fromJson(bytes);
 	if (!document.isObject() || !ValidServices(document.object())) {
-		LOG(("Nagram Error: Invalid services configuration; external services disabled."));
+		LOG(("NoxGram Error: Invalid services configuration; external services disabled."));
 		return std::nullopt;
 	}
 	return UpgradeServices(document.object());

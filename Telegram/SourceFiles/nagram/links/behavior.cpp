@@ -117,9 +117,9 @@ bool OpenOutsideWebview(const QString &uri, const QString &startUrl) {
 	}
 	const auto decision = MatchOutsideWebview(compiled, uri, startUrl);
 	if (!decision.error.isEmpty()) {
-		LOG(("Nagram web app link: %1.").arg(decision.error));
+		LOG(("NoxGram web app link: %1.").arg(decision.error));
 	} else if (decision.open && !AllowOutsideOpen(lastOpen, crl::now())) {
-		LOG(("Nagram web app link: more than one per second, kept inside."));
+		LOG(("NoxGram web app link: more than one per second, kept inside."));
 		return false;
 	}
 	if (decision.open) {

@@ -24,7 +24,7 @@ StartWidget::StartWidget(
 	not_null<Data*> data)
 : Step(parent, account, data, true) {
 	setMouseTracking(true);
-	setTitleText(rpl::single(u"Nagram Desktop"_q));
+	setTitleText(rpl::single(u"NoxGram Desktop"_q));
 	setDescriptionText(tr::lng_nagram_intro_about());
 	show();
 }

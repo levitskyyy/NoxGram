@@ -76,5 +76,5 @@ void TestExport() {
 		&& !PastRange(List{ { 2001 } }, 0),
 		"export keeps going while a slice may hold wanted messages");
 
-	std::cout << "PASS: Nagram export range" << std::endl;
+	std::cout << "PASS: NoxGram export range" << std::endl;
 }

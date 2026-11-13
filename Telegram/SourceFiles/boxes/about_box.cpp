@@ -48,11 +48,11 @@ rpl::producer<TextWithEntities> Text2() {
 		lt_gpl_link,
 		rpl::single(tr::link(
 			"GNU GPL",
-			"https://github.com/NextAlone/Nagram-qt/blob/main/LICENSE")),
+			"https://github.com/levitskyyy/NoxGram/blob/main/LICENSE")),
 		lt_github_link,
 		rpl::single(tr::link(
 			"GitHub",
-			"https://github.com/NextAlone/Nagram-qt")),
+			"https://github.com/levitskyyy/NoxGram")),
 		tr::marked);
 }
 
@@ -66,7 +66,7 @@ rpl::producer<TextWithEntities> Text3() {
 } // namespace
 
 void AboutBox(not_null<Ui::GenericBox*> box) {
-	box->setTitle(u"Nagram Desktop"_q);
+	box->setTitle(u"NoxGram Desktop"_q);
 
 	auto layout = box->verticalLayout();
 

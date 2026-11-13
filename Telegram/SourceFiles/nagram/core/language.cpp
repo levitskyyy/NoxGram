@@ -61,7 +61,7 @@ Translations Load(const QString &path) {
 	const auto parser = Lang::FileParser(content,
 		[&](QLatin1String name, const QByteArray &source) {
 			const auto raw = QByteArray(name.data(), name.size());
-			if (!raw.startsWith("lng_nagram_")) {
+			if (!raw.startsWith("lng_nagram_") && !raw.startsWith("lng_nox_")) {
 				return;
 			}
 			const auto key = Lang::GetKeyIndex(name);
@@ -73,7 +73,7 @@ Translations Load(const QString &path) {
 			}
 		});
 	if (!parser.errors().isEmpty()) {
-		LOG(("Nagram language resource error: %1 (%2)"
+		LOG(("NoxGram language resource error: %1 (%2)"
 			).arg(path, parser.errors()));
 	}
 	return result;
@@ -99,6 +99,16 @@ const Translations &Traditional() {
 	return traditional ? *traditional : empty;
 }
 
+const Translations &Russian() {
+	static const auto empty = Translations();
+	static auto russian = std::optional<Translations>();
+	const auto path = u":/langs/nagram/ru.strings"_q;
+	if (!russian && QFile::exists(path)) {
+		russian = Load(path);
+	}
+	return russian ? *russian : empty;
+}
+
 const Translations &Defaults(const QString &language) {
 	static const auto empty = Translations();
 	auto parts = language.toLower().replace(u'_', u'-').split(u'-');
@@ -106,7 +116,9 @@ const Translations &Defaults(const QString &language) {
 		parts[1][0] = parts[1][0].toUpper();
 	}
 	const auto locale = QLocale(parts.join(u'-'));
-	if (locale.language() != QLocale::Chinese) {
+	if (locale.language() == QLocale::Russian) {
+		return Russian();
+	} else if (locale.language() != QLocale::Chinese) {
 		return empty;
 	}
 	const auto isTraditional = (locale.script() == QLocale::TraditionalHanScript);

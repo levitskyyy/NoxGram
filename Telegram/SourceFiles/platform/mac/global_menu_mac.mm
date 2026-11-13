@@ -426,7 +426,7 @@ void Manager::buildAppleMenu(QMenu *main) {
 			});
 		};
 		_about = main->addAction(
-			u"About Nagram"_q,
+			u"About NoxGram"_q,
 			std::move(callback));
 		_about->setMenuRole(QAction::AboutQtRole);
 	}
@@ -660,7 +660,7 @@ void Manager::buildWindowMenu(QMenu *window) {
 	}
 	window->addSeparator();
 	_showTelegram = window->addAction(
-		u"Show Nagram"_q,
+		u"Show NoxGram"_q,
 		receiver,
 		[this] {
 			if (const auto w = resolveActiveWindow()) {
@@ -672,7 +672,7 @@ void Manager::buildWindowMenu(QMenu *window) {
 }
 
 void Manager::buildMenu() {
-	buildAppleMenu(_menuBar->addMenu(u"Nagram"_q));
+	buildAppleMenu(_menuBar->addMenu(u"NoxGram"_q));
 	_file = _menuBar->addMenu(u"File"_q);
 	buildFileMenu(_file);
 	_edit = _menuBar->addMenu(u"Edit"_q);

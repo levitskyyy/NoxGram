@@ -189,7 +189,7 @@ void StickerExport::fail(ExportError error) {
 	_restartTimer.cancel();
 	_waitTimer.cancel();
 	publish();
-	LOG(("Nagram Sticker Export: stopped, the folder %1."
+	LOG(("NoxGram Sticker Export: stopped, the folder %1."
 		).arg((error == ExportError::Path)
 			? u"is missing or not writable"_q
 			: u"could not be written to"_q));

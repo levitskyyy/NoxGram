@@ -1,48 +1,36 @@
-# Nagram Desktop branding
+# NoxGram Desktop branding
 
-Nagram Desktop is an independent Telegram client maintained by NextAlone.
-It is based on Telegram Desktop; upstream source, history, license and
-copyright notices remain with their respective authors.
+NoxGram Desktop is an independent Telegram client. It is a fork of
+[Nagram Desktop](https://github.com/NextAlone/Nagram-Qt) (by NextAlone), which
+is based on Telegram Desktop; ghost mode and spy mode are modelled on
+[AyuGram Desktop](https://github.com/AyuGram/AyuGramDesktop). Upstream source,
+history, license and copyright notices remain with their respective authors.
 
-The Nagram name and project identity are controlled by NextAlone.
-Nagram icon artwork is Copyright © MaitungTM. All rights reserved.
-The artwork is a separate brand asset; the source-code license does not
-license its use as the branding of third-party distributions. Preserve this
-notice with copied or derived icon assets.
+The NoxGram icon is `Telegram/Resources/branding/noxgram-logo.png`. The
+square rendition `noxgram.png` and every application icon (the PNGs in
+`Telegram/Resources/art`, the macOS `Icon.iconset`, the Windows ICO and the
+alternate icons in `Telegram/Resources/nagram/icons`) are derived from it.
 
-The canonical icon is the Nagram iOS layered artwork, retained in
-`Telegram/Resources/branding/Nagram.icon`. Its desktop rendition is exported
-with Xcode Icon Composer into `nagram.png`; application PNGs, the Windows ICO,
-macOS icon sets and non-macOS tray glyphs are derived from this artwork.
-Desktop PNG renditions use 8-bit sRGB with alpha for platform compatibility.
-
-On macOS the bundle icon is compiled from `Nagram.icon` when Xcode 26 or later
-is available, so the system renders it. The alternate icons offered in the
-settings are the Nagram iOS alternates, retained as `Nagram*.icon` next to it;
-`export_icons.py` renders their light and dark renditions into
-`Telegram/Resources/nagram/icons`. The same copyright applies to them.
-Required upstream and third-party notices remain unchanged.
-
-The macOS menu bar retains the upstream Telegram paper-plane glyph and unread
-badge rendering, including its sizing and appearance handling.
+The Nagram icon artwork (Copyright © MaitungTM) is not part of NoxGram: its
+Icon Composer documents were removed and the macOS build uses the static
+icon set. The monochrome tray glyph `nagram-symbolic.svg` is still the
+Nagram one and should be replaced with a NoxGram glyph.
 
 Application identity:
 
-- Display name: Nagram Desktop; executable and macOS bundle: Nagram.
-- macOS and Linux application ID: `xyz.nextalone.nagram.desktop`.
-- Windows application ID: `NextAlone.NagramDesktop` with a distinct installer
-  ID and notification activator.
-- macOS data directory: `Application Support/Nagram Desktop`; Linux uses
-  `NagramDesktop` under the system application data directory. Existing
-  Telegram profiles are not imported automatically.
-- Portable directory: `NagramForcePortable`.
+- Display name: NoxGram Desktop; executable: NoxGram; macOS bundle:
+  NoxGram Desktop.
+- macOS and Linux application ID: `app.noxgram.desktop`.
+- Windows application ID: `NoxGram.NoxGramDesktop`.
+- Portable directory: `NoxGramForcePortable`.
 - Telegram `tg:` and `tonsite:` protocol compatibility is retained.
 
-Upstream crash submission is disabled at build time. Release builds update
-themselves from this repository's releases and accept only packages signed
-with Nagram keys; the Telegram update feeds are not queried. Other builds
-have automatic updates disabled. Manual release links point to this
-repository. Store distribution is not configured; desktop builds are
-supported. Internal build targets, resource bundle names and Telegram
-service/protocol names remain compatible with the upstream build system.
-Signing and distribution credentials are kept outside the repository.
+Release links point to https://github.com/levitskyyy/NoxGram. Update packages
+are still verified with the Nagram keys in `Telegram/Resources/nagram/update`;
+replace them with NoxGram keys before publishing updates, or build with
+`DESKTOP_APP_DISABLE_AUTOUPDATE=ON`.
+
+Internal names stay as in Nagram to keep upstream merges simple: the CMake
+target `Telegram`, the `Nagram` C++ namespace, `nagram/` source paths,
+`lng_nagram_*` string keys and `nagram.*` setting keys. Packaging scripts in
+`tools/nagram`, `packaging/` and `snap/` still describe Nagram releases.

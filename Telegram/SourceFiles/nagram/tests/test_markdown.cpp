@@ -135,5 +135,5 @@ void TestMarkdown() {
 		{ Style::Italic, 1, -1 },
 		{ Style::Bold, 2, 2147483647 },
 	}, u"ab**c**"_q, "spans outside the text clamped");
-	std::cout << "PASS: Nagram Markdown copy" << std::endl;
+	std::cout << "PASS: NoxGram Markdown copy" << std::endl;
 }

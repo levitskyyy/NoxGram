@@ -1722,7 +1722,7 @@ void NativeManager::doShowNotification(NotificationFields &&fields) {
 		: (scheduled && peer->isSelf())
 		? tr::lng_notification_reminder(tr::now)
 		: subWithChat();
-	const auto fullTitle = demo ? u"Nagram"_q : addTargetAccountName(title, &peer->session());
+	const auto fullTitle = demo ? u"NoxGram"_q : addTargetAccountName(title, &peer->session());
 	const auto hideReactionSender = reactionFrom
 		&& !peer->session().api().reactionsNotifySettings()
 			.showPreviewsCurrent();

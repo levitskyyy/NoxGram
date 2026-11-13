@@ -1,0 +1,35 @@
+/*
+NoxGram strings. Ghost mode and spy mode are modelled on AyuGram Desktop
+(https://github.com/AyuGram/AyuGramDesktop).
+*/
+
+"lng_nox_ghost_spy" = "Ghost and spy mode";
+"lng_nox_ghost_title" = "Ghost mode";
+"lng_nox_ghost_mode" = "Ghost mode";
+"lng_nox_ghost_mode_about" = "While ghost mode is on, the parts selected below are not sent to Telegram. You can switch it quickly from the main menu.";
+"lng_nox_ghost_hide_read" = "Don't send read receipts";
+"lng_nox_ghost_hide_stories" = "Don't mark stories as seen";
+"lng_nox_ghost_hide_online" = "Don't send online status";
+"lng_nox_ghost_hide_typing" = "Don't send typing and upload status";
+"lng_nox_ghost_offline_after_online" = "Go offline after actions";
+"lng_nox_ghost_offline_after_online_about" = "Sending a message, a reaction or a vote makes Telegram show you online. NoxGram sends an offline status right after that.";
+"lng_nox_ghost_read_on_action" = "Read chat when replying";
+"lng_nox_ghost_read_on_action_about" = "When you send something to a chat, it is marked as read, so your reply does not appear next to unread messages.";
+"lng_nox_ghost_schedule_send" = "Send text messages as scheduled";
+"lng_nox_ghost_schedule_send_about" = "Text messages are scheduled about 12 seconds ahead, so sending them does not make you appear online.";
+"lng_nox_ghost_menu_toggle" = "Show switch in the main menu";
+
+"lng_nox_spy_title" = "Spy mode";
+"lng_nox_save_deleted" = "Keep deleted messages";
+"lng_nox_save_edits" = "Keep edit history";
+"lng_nox_keep_self_destructing" = "Keep self-destructing messages";
+"lng_nox_save_for_bots" = "Also in chats with bots";
+"lng_nox_spy_about" = "Messages deleted by others stay in the chat with a “deleted” mark until restart. Their text and the previous versions of edited messages are saved on this device only, in the tdata folder, and can be opened from the chat menu and the message menu.";
+"lng_nox_deleted_mark" = "deleted";
+"lng_nox_spy_edit_history" = "Edit history";
+"lng_nox_spy_current_version" = "Current version";
+"lng_nox_spy_deleted_messages" = "Deleted messages";
+"lng_nox_spy_deleted_none" = "No deleted messages were saved in this chat.";
+"lng_nox_spy_deleted_at" = "deleted {date}";
+"lng_nox_spy_empty_text" = "(no text)";
+"lng_nox_spy_clear" = "Clear";

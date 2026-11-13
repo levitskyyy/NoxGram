@@ -41,6 +41,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_chat.h"
 
 #include "base/random.h"
+#include "noxgram/ghost.h"
 
 namespace Data {
 namespace {
@@ -1487,6 +1488,7 @@ void Reactions::send(not_null<HistoryItem*> item, bool addToRecent) {
 	} else {
 		i = _sentRequests.emplace(id).first;
 	}
+	Nox::Ghost::MarkReadAfterAction(item->history());
 	const auto chosen = item->chosenReactions();
 	using Flag = MTPmessages_SendReaction::Flag;
 	const auto flags = (chosen.empty() ? Flag(0) : Flag::f_reaction)

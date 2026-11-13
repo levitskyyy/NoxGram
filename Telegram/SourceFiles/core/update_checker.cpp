@@ -2209,7 +2209,7 @@ void UpdateApplication() {
 			} else if (KSandbox::isSnap()) {
 				return "https://snapcraft.io/telegram-desktop";
 			}
-			return "https://github.com/NextAlone/Nagram-qt/releases";
+			return "https://github.com/levitskyyy/NoxGram/releases";
 #endif // OS_WIN_STORE || OS_MAC_STORE
 		}();
 		UrlClickHandler::Open(url);

@@ -26,7 +26,7 @@ static_assert(kDownloadPart == Storage::kDownloadPartSize);
 		auto &options = ForDevice();
 		auto value = options.Get(kDownloadSpeedBoost);
 		if (options.invalidKeys().contains(kDownloadSpeedBoost.key)) {
-			LOG(("Nagram Network: Bad download acceleration value, "
+			LOG(("NoxGram Network: Bad download acceleration value, "
 				"using Telegram defaults."));
 		}
 		return value;
@@ -123,7 +123,7 @@ void CheckDohReply(
 		: tr::lng_nagram_custom_doh_bad_response(tr::now);
 	auto &failure = DohFailure();
 	if (!text.isEmpty() && failure.current().isEmpty()) {
-		LOG(("Nagram Network: Custom DoH request failed, error: %1 (%2)"
+		LOG(("NoxGram Network: Custom DoH request failed, error: %1 (%2)"
 			).arg(failed ? reply->errorString() : u"not a JSON answer"_q
 			).arg(reply->error()));
 		if (const auto window = Core::App().activeWindow()) {

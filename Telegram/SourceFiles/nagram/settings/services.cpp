@@ -752,7 +752,7 @@ const auto kMeta = BuildHelper({
 			}
 			controller->show(Box(ServicesBox, *current));
 		},
-		.keywords = { u"Nagram"_q, u"LLM"_q, u"API"_q },
+		.keywords = { u"NoxGram"_q, u"LLM"_q, u"API"_q },
 	});
 	builder.addDividerText(tr::lng_nagram_services_about());
 	builder.addButton({

@@ -38,6 +38,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/window_session_controller.h"
 #include "styles/style_chat.h"
 #include "styles/style_credits.h"
+#include "noxgram/spy.h"
 
 namespace HistoryView {
 namespace {
@@ -509,7 +510,12 @@ void BottomInfo::layoutDateText() {
 			& (Data::Flag::ForwardedDate | Data::Flag::FullDate))
 		? Nagram::Messages::FormatSavedFrom(_data.date)
 		: Nagram::Messages::FormatTime(_data.date.time()));
-	const auto date = Nagram::Messages::WithBubbleId(plainDate, _data);
+	const auto deleted = (_data.flags & Data::Flag::NoxDeleted)
+		? (Nox::Spy::DeletedMark() + ' ')
+		: QString();
+	const auto date = Nagram::Messages::WithBubbleId(
+		deleted + plainDate,
+		_data);
 	const auto prefix = (!author.isEmpty() && !date.isEmpty())
 		? u", "_q : QString();
 	const auto afterAuthor = prefix + date;
@@ -707,6 +713,9 @@ BottomInfo::Data BottomInfoDataFromMessage(not_null<Message*> message) {
 			result.flags |= Flag::EditedPrimary;
 			result.editedDate = base::unixtime::parse(editedDate);
 		}
+	}
+	if (item->isNoxDeleted()) {
+		result.flags |= Flag::NoxDeleted;
 	}
 	if (IsAnchoredEphemeral(item)) {
 		result.flags |= Flag::Updated;

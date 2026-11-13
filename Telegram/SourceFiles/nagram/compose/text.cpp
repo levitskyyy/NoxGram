@@ -126,7 +126,7 @@ TextWithEntities PrepareText(const TextWithEntities &text, bool editing) {
 		if (auto result = Messages::ConvertChinese(text, chinese == 2)) {
 			converted = std::move(*result);
 		} else {
-			LOG(("Nagram: Chinese conversion unavailable; text sent as typed."));
+			LOG(("NoxGram: Chinese conversion unavailable; text sent as typed."));
 		}
 	}
 	auto result = enabled ? AddChineseLatinSpacing(converted) : converted;
@@ -198,7 +198,7 @@ QString FormatMenuItemTitle(int index) {
 	case 7: return tr::lng_menu_formatting_link_create(tr::now);
 	case 8: return tr::lng_menu_formatting_clear(tr::now);
 	}
-	Unexpected("Nagram format menu item index.");
+	Unexpected("NoxGram format menu item index.");
 }
 
 void InstallFieldHooks(not_null<Ui::InputField*> field) {

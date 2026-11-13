@@ -232,5 +232,5 @@ void TestP3Misc() {
 	TestWebAppSize();
 	TestRegistrationDate();
 	TestRegistrationEstimate();
-	std::cout << "PASS: Nagram P3-09 options" << std::endl;
+	std::cout << "PASS: NoxGram P3-09 options" << std::endl;
 }

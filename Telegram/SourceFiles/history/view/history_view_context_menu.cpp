@@ -127,6 +127,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QClipboard>
+#include "noxgram/spy.h"
 
 namespace HistoryView {
 namespace {
@@ -1412,6 +1413,7 @@ void AddTopMessageActions(
 	AddGoToMessageAction(menu, request, list);
 	AddViewRepliesAction(menu, request, list);
 	AddEditMessageAction(menu, request, list);
+	Nox::Spy::AddMessageActions(menu, list->controller(), request.item);
 	AddFactcheckAction(menu, request, list);
 	AddPinMessageAction(menu, request, list);
 	AddViewStatisticsAction(menu, request, list);

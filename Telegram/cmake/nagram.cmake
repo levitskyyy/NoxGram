@@ -155,6 +155,9 @@ set(nagram_sources
     nagram/services/transcription.cpp
     nagram/services/transcription_queue.cpp
     nagram/services/system_ai.cpp
+    noxgram/ghost.cpp
+    noxgram/ghost_spy_settings.cpp
+    noxgram/spy.cpp
 )
 
 if (nagram_sources)
@@ -229,6 +232,9 @@ endif()
 # Compiles the Icon Composer document so macOS renders the app icon itself.
 function(nagram_mac_app_icon result)
     set(${result} FALSE PARENT_SCOPE)
+    # NoxGram: the Nagram Icon Composer artwork is not shipped, the bundle
+    # uses the static Icon.iconset generated from the NoxGram logo.
+    return()
     execute_process(
         COMMAND xcodebuild -version
         OUTPUT_VARIABLE xcode_version_output

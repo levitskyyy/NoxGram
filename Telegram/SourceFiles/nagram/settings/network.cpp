@@ -80,7 +80,7 @@ QString IpStrategyLabel(int value) {
 	case Strategy::Ipv6Only:
 		return tr::lng_nagram_ip_strategy_ipv6_only(tr::now);
 	}
-	Unexpected("Invalid Nagram IP strategy.");
+	Unexpected("Invalid NoxGram IP strategy.");
 }
 
 void IpStrategyBox(not_null<Ui::GenericBox*> box) {

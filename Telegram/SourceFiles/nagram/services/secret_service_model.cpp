@@ -23,13 +23,13 @@ constexpr const char *kUnavailableErrors[] = {
 Attributes ItemAttributes(const QString &account) {
 	return {
 		{ "xdg:schema", kSchema },
-		{ "service", "Nagram Desktop Services" },
+		{ "service", "NoxGram Desktop Services" },
 		{ "account", account.toUtf8() },
 	};
 }
 
 QByteArray ItemLabel(const QString &account) {
-	return "Nagram Desktop Services/" + account.toUtf8();
+	return "NoxGram Desktop Services/" + account.toUtf8();
 }
 
 bool NoObject(const QByteArray &path) {

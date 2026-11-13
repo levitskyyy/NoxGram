@@ -193,5 +193,5 @@ void TestNotifications() {
 		&& registry.HasFlag(kQuietHours.key, Flag::Exportable)
 		&& !registry.HasFlag(kKeywordAlerts.key, Flag::Exportable),
 		"notification option scopes");
-	std::cout << "PASS: Nagram quiet hours and keyword alerts" << std::endl;
+	std::cout << "PASS: NoxGram quiet hours and keyword alerts" << std::endl;
 }

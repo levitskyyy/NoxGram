@@ -34,7 +34,7 @@ bool HandleExternalLink(const QString &url, const QVariant &context) {
 	const auto active = Core::App().activeWindow();
 	const auto window = active ? active : Core::App().activePrimaryWindow();
 	if (!click.show && !window) {
-		LOG(("Nagram link: confirmation requires an application window; reopen the link from Nagram."));
+		LOG(("NoxGram link: confirmation requires an application window; reopen the link from NoxGram."));
 		return true;
 	}
 	const auto show = [&](object_ptr<Ui::BoxContent> box) {
@@ -46,7 +46,7 @@ bool HandleExternalLink(const QString &url, const QVariant &context) {
 		}
 	};
 	if (!result.error.isEmpty()) {
-		LOG(("Nagram link: %1.").arg(result.error));
+		LOG(("NoxGram link: %1.").arg(result.error));
 		show(Ui::MakeInformBox(result.error));
 		return true;
 	}

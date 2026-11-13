@@ -677,5 +677,5 @@ void TestMedia() {
 	TestExportPlan();
 	TestExportRun();
 	TestWebAppPlatform();
-	std::cout << "PASS: Nagram media backends" << std::endl;
+	std::cout << "PASS: NoxGram media backends" << std::endl;
 }

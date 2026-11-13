@@ -26,6 +26,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "main/main_session.h"
 #include "ui/layers/show.h"
 #include "ui/text/text_utilities.h"
+#include "noxgram/ghost.h"
 
 namespace Data {
 namespace {
@@ -1419,6 +1420,11 @@ void Stories::checkQuitPreventFinished() {
 
 void Stories::sendMarkAsReadRequests() {
 	_markReadTimer.cancel();
+	if (!Nox::Ghost::SendReadStories()) {
+		// NoxGram ghost mode: stories are marked as seen locally only.
+		_markReadPending.clear();
+		return;
+	}
 	for (auto i = begin(_markReadPending); i != end(_markReadPending);) {
 		const auto peerId = *i;
 		if (_markReadRequests.contains(peerId)) {
@@ -1435,6 +1441,9 @@ void Stories::sendMarkAsReadRequests() {
 
 void Stories::sendIncrementViewsRequests() {
 	if (_incrementViewsPending.empty()) {
+		return;
+	} else if (!Nox::Ghost::SendReadStories()) {
+		_incrementViewsPending.clear();
 		return;
 	}
 	struct Prepared {

@@ -34,6 +34,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "iv/iv_rich_page.h"
 #include "core/application.h"
 #include "apiwrap.h"
+#include "noxgram/ghost.h"
 
 namespace Data {
 namespace {
@@ -722,6 +723,21 @@ void Histories::sendReadRequests() {
 	if (_states.empty()) {
 		return;
 	}
+	if (!Nox::Ghost::SendReadMessages()) {
+		// NoxGram ghost mode: messages are read locally only.
+		_readRequestsTimer.cancel();
+		auto histories = std::vector<not_null<History*>>();
+		histories.reserve(_states.size());
+		for (auto &[history, state] : _states) {
+			state.willReadTill = 0;
+			state.willReadWhen = 0;
+			histories.push_back(history);
+		}
+		for (const auto &history : histories) {
+			checkEmptyState(history);
+		}
+		return;
+	}
 	const auto now = crl::now();
 	auto next = std::optional<crl::time>();
 	for (auto &[history, state] : _states) {
@@ -1152,6 +1168,7 @@ int Histories::sendPreparedMessage(
 		Fn<PreparedMessage(not_null<History*>, FullReplyTo)> message,
 		Fn<void(const MTPUpdates&, const MTP::Response&)> done,
 		Fn<void(const MTP::Error&, const MTP::Response&)> fail) {
+	Nox::Ghost::MarkReadAfterAction(history);
 	if (isCreatingTopic(history, replyTo.topicRootId)) {
 		const auto id = ++_requestAutoincrement;
 		const auto creatingId = FullMsgId(

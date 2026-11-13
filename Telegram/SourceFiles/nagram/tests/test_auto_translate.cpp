@@ -211,5 +211,5 @@ void TestAutoTranslate() {
 	TestResolve();
 	TestChats();
 	TestOptions();
-	std::cout << "PASS: Nagram auto-translate modes" << std::endl;
+	std::cout << "PASS: NoxGram auto-translate modes" << std::endl;
 }

@@ -680,14 +680,14 @@ void TestLocalOnlyList() {
 
 void TestSync() {
 	TestCloudThemeRef();
-	std::cout << "PASS: Nagram screenshot cloud theme reference" << std::endl;
+	std::cout << "PASS: NoxGram screenshot cloud theme reference" << std::endl;
 	TestEnvelope();
 	TestDecision();
 	TestSupersededBackups();
 	TestState();
 	TestAllowlist();
 	TestLocalOnlyList();
-	std::cout << "PASS: Nagram cloud backup" << std::endl;
+	std::cout << "PASS: NoxGram cloud backup" << std::endl;
 	TestAutoBackup();
-	std::cout << "PASS: Nagram automatic cloud backup" << std::endl;
+	std::cout << "PASS: NoxGram automatic cloud backup" << std::endl;
 }

@@ -457,5 +457,5 @@ void TestFilterScopes() {
 	TestScopeValidation();
 	TestScopeOptions();
 	TestRegexBudget();
-	std::cout << "PASS: Nagram filter inheritance and regex limits" << std::endl;
+	std::cout << "PASS: NoxGram filter inheritance and regex limits" << std::endl;
 }

@@ -95,6 +95,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/call_delayed.h"
 #include "base/random.h"
 #include "spellcheck/spellcheck_highlight_syntax.h"
+#include "noxgram/spy.h"
 
 namespace Data {
 namespace {
@@ -3069,6 +3070,10 @@ void Session::updateEditedMessage(const MTPMessage &data) {
 		Reactions::CheckUnknownForUnread(this, data);
 		return;
 	}
+	if (data.type() == mtpc_message) {
+		// NoxGram spy mode: remember the text before it is replaced.
+		Nox::Spy::RememberEdit(existing, qs(data.c_message().vmessage()));
+	}
 	if (existing->isLocalUpdateMedia() && data.type() == mtpc_message) {
 		updateExistingMessage(data.c_message());
 	}
@@ -3219,6 +3224,10 @@ void Session::checkTTLs() {
 		}
 		expired.insert(expired.end(), items.begin(), items.end());
 	}
+	// NoxGram spy mode: keep self-destructing messages that ran out.
+	expired.erase(ranges::remove_if(expired, [](not_null<HistoryItem*> item) {
+		return Nox::Spy::KeepExpired(item);
+	}), expired.end());
 	if (!expired.empty()) {
 		notifyItemsAboutToBeDestroyed(expired);
 		for (const auto &item : expired) {
@@ -3355,7 +3364,9 @@ void Session::processMessagesDeleted(
 		const auto i = list ? list->find(messageId.v) : Messages::iterator();
 		if (list && i != list->end()) {
 			const auto history = i->second->history();
-			toDestroy.push_back(i->second);
+			if (!Nox::Spy::KeepDeleted(i->second)) {
+				toDestroy.push_back(i->second);
+			}
 			historiesToCheck.emplace(history);
 		} else if (affected) {
 			affected->unknownMessageDeleted(messageId.v);
@@ -3381,7 +3392,9 @@ void Session::processNonChannelMessagesDeleted(const QVector<MTPint> &data) {
 	for (const auto &messageId : data) {
 		if (const auto item = nonChannelMessage(messageId.v)) {
 			const auto history = item->history();
-			toDestroy.push_back(item);
+			if (!Nox::Spy::KeepDeleted(item)) {
+				toDestroy.push_back(item);
+			}
 			historiesToCheck.emplace(history);
 		}
 	}

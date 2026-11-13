@@ -198,7 +198,7 @@ QString ModeLabel(Mode mode, const QString &inherit) {
 	case Mode::On: return tr::lng_nagram_auto_translate_on(tr::now);
 	case Mode::Off: return tr::lng_nagram_auto_translate_off(tr::now);
 	}
-	Unexpected("Invalid Nagram auto-translate mode.");
+	Unexpected("Invalid NoxGram auto-translate mode.");
 }
 
 rpl::producer<QString> AboutValue(not_null<Main::Session*> session) {

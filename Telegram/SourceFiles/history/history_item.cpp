@@ -93,6 +93,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_chat.h"
 #include "styles/style_credits.h"
 #include "styles/style_dialogs.h"
+#include "noxgram/spy.h"
 
 namespace {
 
@@ -3227,6 +3228,40 @@ void HistoryItem::addToUnreadThings(HistoryUnreadThings::AddType type) {
 	}
 }
 
+void HistoryItem::setNoxDeleted() {
+	if (_noxDeleted) {
+		return;
+	}
+	_noxDeleted = true;
+	if (_ttlDestroyAt) {
+		applyTTL(TimeId(0));
+	}
+	// Unread marks of a message that is gone on the server can't be
+	// cleared there any more, so they are dropped locally.
+	if (isUnreadMention()) {
+		history()->unreadMentions().erase(id);
+		if (const auto topic = this->topic()) {
+			topic->unreadMentions().erase(id);
+		}
+	}
+	if (hasUnreadReaction()) {
+		history()->unreadReactions().erase(id);
+		if (const auto topic = this->topic()) {
+			topic->unreadReactions().erase(id);
+		} else if (const auto sublist = this->savedSublist()) {
+			sublist->unreadReactions().erase(id);
+		}
+	}
+	if (hasUnreadPollVote()) {
+		history()->unreadPollVotes().erase(id);
+		if (const auto topic = this->topic()) {
+			topic->unreadPollVotes().erase(id);
+		}
+	}
+	history()->owner().requestItemViewRefresh(this);
+	history()->owner().requestItemResize(this);
+}
+
 void HistoryItem::destroyHistoryEntry() {
 	if (isUnreadMention()) {
 		history()->unreadMentions().erase(id);
@@ -3420,7 +3455,7 @@ void HistoryItem::setRealId(MsgId newId) {
 }
 
 bool HistoryItem::canPin() const {
-	if (!isRegular() || isService()) {
+	if (_noxDeleted || !isRegular() || isService()) {
 		return false;
 	} else if (const auto m = media(); m && m->call()) {
 		return false;
@@ -3457,6 +3492,9 @@ bool HistoryItem::isTooOldForEdit(TimeId now) const {
 }
 
 bool HistoryItem::allowsEdit(TimeId now) const {
+	if (_noxDeleted) {
+		return false;
+	}
 	const auto richPageSource = Get<HistoryMessageRichPageSource>();
 	const auto richPage = BestRichPage(richPageSource);
 	return !isService()
@@ -3478,7 +3516,9 @@ bool HistoryItem::allowsEditMedia() const {
 }
 
 bool HistoryItem::canBeEdited() const {
-	if ((!isRegular()
+	if (_noxDeleted) {
+		return false;
+	} else if ((!isRegular()
 			&& !isScheduled()
 			&& !isBusinessShortcut()
 			&& !isWelcomeTemplate())
@@ -3820,7 +3860,7 @@ void HistoryItem::translationDone(
 }
 
 bool HistoryItem::canReact() const {
-	if (!isRegular()) {
+	if (_noxDeleted || !isRegular()) {
 		return false;
 	} else if (isService()) {
 		return (_flags & MessageFlag::ReactionsAllowed);
@@ -4530,7 +4570,9 @@ void HistoryItem::applyTTL(TimeId destroyAt) {
 		const auto session = &_history->session();
 		crl::on_main(session, [session, id = fullId()]{
 			if (const auto item = session->data().message(id)) {
-				session->data().destroyMessageWithCacheCleanup(item);
+				if (!Nox::Spy::KeepExpired(item)) {
+					session->data().destroyMessageWithCacheCleanup(item);
+				}
 			}
 		});
 	} else {

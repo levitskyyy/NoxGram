@@ -17,7 +17,7 @@ inline constexpr auto kCollectionInterface = "org.freedesktop.Secret.Collection"
 inline constexpr auto kItemInterface = "org.freedesktop.Secret.Item";
 inline constexpr auto kSessionInterface = "org.freedesktop.Secret.Session";
 inline constexpr auto kPromptInterface = "org.freedesktop.Secret.Prompt";
-inline constexpr auto kSchema = "xyz.nextalone.nagram.desktop.Services";
+inline constexpr auto kSchema = "app.noxgram.desktop.Services";
 
 using Attributes = std::vector<std::pair<QByteArray, QByteArray>>;
 

@@ -13,6 +13,7 @@ include(cmake/generate_lang.cmake)
 set(nagram_lang_sources
     ${res_loc}/langs/lang.strings
     ${res_loc}/langs/nagram/nagram.strings
+    ${res_loc}/langs/nagram/noxgram.strings
 )
 set(nagram_lang_merged ${CMAKE_CURRENT_BINARY_DIR}/gen/lang_merged.strings)
 set(nagram_lang_content "")

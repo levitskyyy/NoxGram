@@ -430,7 +430,7 @@ void TestOptions() {
 	Require(options.Get(text).isEmpty(), "empty string round trip");
 	Require(!options.Set(text, QString::fromUtf8("two\nlines")),
 		"multiline string accepted");
-	std::cout << "PASS: Nagram device options" << std::endl;
+	std::cout << "PASS: NoxGram device options" << std::endl;
 
 	const auto accountOption = Option<bool>{
 		"nagram.testAccount", Scope::Account, false, Category::Chats,
@@ -443,7 +443,7 @@ void TestOptions() {
 	Require(first.Get(accountOption), "first account value");
 	Require(!second.Get(accountOption), "account values leaked");
 	Require(!options.Set(accountOption, true), "device accepted account option");
-	std::cout << "PASS: Nagram account options" << std::endl;
+	std::cout << "PASS: NoxGram account options" << std::endl;
 
 	auto exchangeRegistry = Registry();
 	Require(exchangeRegistry.Add(option), "exchange int registration");
@@ -515,5 +515,5 @@ void TestOptions() {
 		"app icon path accepted");
 	Require(!Interface::ValidAppIcon(QString::fromLatin1("Block")),
 		"unknown app icon accepted");
-	std::cout << "PASS: Nagram settings exchange" << std::endl;
+	std::cout << "PASS: NoxGram settings exchange" << std::endl;
 }
