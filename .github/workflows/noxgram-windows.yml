@@ -369,6 +369,6 @@ jobs:
           gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1 \
             || gh release create "$TAG" -R "$GITHUB_REPOSITORY" --verify-tag \
               --title "NoxGram $TAG" \
-              --notes "NoxGram build for testing. macOS: unpack, move to Applications, right-click and choose Open (the app is not notarized)." \
+              --notes "NoxGram build. macOS: open the .dmg and drag NoxGram to Applications. Until the app is notarized, start it the first time with right-click → Open." \
             || true
           gh release upload "$TAG" "artifact/NoxGram-windows-${{ matrix.arch }}.zip" -R "$GITHUB_REPOSITORY" --clobber

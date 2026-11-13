@@ -98,7 +98,11 @@ class SignMacosTest(unittest.TestCase):
         result = self.sign({})
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("::warning::", result.stdout)
-        self.assertEqual(self.calls(), [f"codesign --force --deep --sign - {self.app}"])
+        self.assertEqual(self.calls(), [
+            "codesign --force --deep --options runtime"
+            f" --entitlements {self.entitlements} --sign - {self.app}",
+            f"codesign --verify --deep --strict {self.app}",
+        ])
 
     def test_a_partial_set_of_secrets_is_an_error(self):
         result = self.sign({**API_KEY, "NAGRAM_MACOS_CERTIFICATE": "Y2VydA=="})

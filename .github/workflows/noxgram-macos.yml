@@ -157,17 +157,29 @@ jobs:
 
           cmake --build ../out --config $CONFIG --parallel
 
-      - name: Move artifact.
+      # Signed with the Developer ID certificate and notarized when the
+      # NOXGRAM_MACOS_* and NOXGRAM_NOTARY_* secrets are set, ad hoc otherwise.
+      - name: Sign and pack.
+        env:
+          NAGRAM_MACOS_CERTIFICATE: ${{ secrets.NOXGRAM_MACOS_CERTIFICATE }}
+          NAGRAM_MACOS_CERTIFICATE_PASSWORD: ${{ secrets.NOXGRAM_MACOS_CERTIFICATE_PASSWORD }}
+          NAGRAM_NOTARY_KEY: ${{ secrets.NOXGRAM_NOTARY_KEY }}
+          NAGRAM_NOTARY_KEY_ID: ${{ secrets.NOXGRAM_NOTARY_KEY_ID }}
+          NAGRAM_NOTARY_ISSUER_ID: ${{ secrets.NOXGRAM_NOTARY_ISSUER_ID }}
+          NAGRAM_NOTARY_APPLE_ID: ${{ secrets.NOXGRAM_NOTARY_APPLE_ID }}
+          NAGRAM_NOTARY_PASSWORD: ${{ secrets.NOXGRAM_NOTARY_PASSWORD }}
+          NAGRAM_NOTARY_TEAM_ID: ${{ secrets.NOXGRAM_NOTARY_TEAM_ID }}
         run: |
-          cd $REPO_NAME/out/$CONFIG
-          mkdir artifact
-          strip "NoxGram Desktop.app/Contents/MacOS/NoxGram Desktop"
-          # Unsigned: an ad-hoc signature lets it start after
-          # "Open" in the Finder context menu.
-          codesign --force --deep --sign - "NoxGram Desktop.app"
-          # An artifact keeps neither the executable bits nor the links
-          # of a bundle, the archive does.
-          ditto -c -k --keepParent "NoxGram Desktop.app" artifact/NoxGram-macos.zip
+          cd $REPO_NAME
+          app="out/$CONFIG/NoxGram Desktop.app"
+          strip "$app/Contents/MacOS/NoxGram Desktop"
+          bash tools/nagram/sign_macos.sh "$app" Telegram/Telegram/Telegram.entitlements
+          python3 -m venv "$RUNNER_TEMP/dmg"
+          "$RUNNER_TEMP/dmg/bin/pip" install --require-hashes -r tools/nagram/macos_dmg.txt
+          mkdir -p "out/$CONFIG/artifact"
+          "$RUNNER_TEMP/dmg/bin/python" tools/nagram/macos_dmg.py \
+            --app "$app" --out "out/$CONFIG/artifact/NoxGram-macos.dmg"
+          bash tools/nagram/sign_macos.sh "out/$CONFIG/artifact/NoxGram-macos.dmg"
           echo "ARTIFACT_NAME=NoxGram-macos" >> $GITHUB_ENV
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.UPLOAD_ARTIFACT == 'true'
@@ -188,6 +200,6 @@ jobs:
           gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1 \
             || gh release create "$TAG" -R "$GITHUB_REPOSITORY" --verify-tag \
               --title "NoxGram $TAG" \
-              --notes "NoxGram build for testing. macOS: unpack, move to Applications, right-click and choose Open (the app is not notarized)." \
+              --notes "NoxGram build. macOS: open the .dmg and drag NoxGram to Applications. Until the app is notarized, start it the first time with right-click → Open." \
             || true
-          gh release upload "$TAG" "$REPO_NAME/out/$CONFIG/artifact/NoxGram-macos.zip" -R "$GITHUB_REPOSITORY" --clobber
+          gh release upload "$TAG" "$REPO_NAME/out/$CONFIG/artifact/NoxGram-macos.dmg" -R "$GITHUB_REPOSITORY" --clobber
