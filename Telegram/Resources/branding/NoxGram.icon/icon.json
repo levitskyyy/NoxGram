@@ -1,0 +1,29 @@
+{
+  "fill" : {
+    "solid" : "srgb:0.15686,0.21569,0.37255,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "glass" : false,
+          "image-name" : "noxgram.png",
+          "name" : "noxgram"
+        }
+      ],
+      "name" : "logo",
+      "shadow" : {
+        "kind" : "none",
+        "opacity" : 0
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : "shared"
+  }
+}

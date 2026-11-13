@@ -232,9 +232,6 @@ endif()
 # Compiles the Icon Composer document so macOS renders the app icon itself.
 function(nagram_mac_app_icon result)
     set(${result} FALSE PARENT_SCOPE)
-    # NoxGram: the Nagram Icon Composer artwork is not shipped, the bundle
-    # uses the static Icon.iconset generated from the NoxGram logo.
-    return()
     execute_process(
         COMMAND xcodebuild -version
         OUTPUT_VARIABLE xcode_version_output
@@ -247,7 +244,7 @@ function(nagram_mac_app_icon result)
         message(STATUS "Nagram: Xcode ${CMAKE_MATCH_1} cannot compile .icon documents, using the static app icon.")
         return()
     endif()
-    set(icon_source ${res_loc}/branding/Nagram.icon)
+    set(icon_source ${res_loc}/branding/NoxGram.icon)
     set(icon_output ${CMAKE_CURRENT_BINARY_DIR}/nagram_icon)
     set(icon_deployment "${CMAKE_OSX_DEPLOYMENT_TARGET}")
     if (NOT icon_deployment)
@@ -255,11 +252,11 @@ function(nagram_mac_app_icon result)
     endif()
     file(GLOB_RECURSE icon_inputs CONFIGURE_DEPENDS ${icon_source}/*)
     add_custom_command(
-        OUTPUT ${icon_output}/Assets.car ${icon_output}/Nagram.icns
+        OUTPUT ${icon_output}/Assets.car ${icon_output}/NoxGram.icns
         COMMAND ${CMAKE_COMMAND} -E make_directory ${icon_output}
         COMMAND xcrun actool ${icon_source}
             --compile ${icon_output}
-            --app-icon Nagram
+            --app-icon NoxGram
             --platform macosx
             --minimum-deployment-target ${icon_deployment}
             --output-partial-info-plist ${icon_output}/partial.plist
@@ -268,11 +265,11 @@ function(nagram_mac_app_icon result)
         VERBATIM)
     set_source_files_properties(
         ${icon_output}/Assets.car
-        ${icon_output}/Nagram.icns
+        ${icon_output}/NoxGram.icns
         PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     target_add_resource(Telegram
         ${icon_output}/Assets.car
-        ${icon_output}/Nagram.icns)
+        ${icon_output}/NoxGram.icns)
     set(${result} TRUE PARENT_SCOPE)
 endfunction()
 
