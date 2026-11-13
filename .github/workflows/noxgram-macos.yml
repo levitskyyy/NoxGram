@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - noxgram
+    # A pushed tag like v7.4.1-nox.1 builds and attaches to its release.
+    tags:
+      - 'v*'
     paths-ignore:
       - 'docs/**'
       - '**.md'
@@ -29,7 +32,7 @@ jobs:
 
     # Dropping superseded caches needs to delete them.
     permissions:
-      contents: read
+      contents: write
       actions: write
 
     strategy:
@@ -174,3 +177,17 @@ jobs:
           path: ${{ env.REPO_NAME }}/out/${{ env.CONFIG }}/artifact/
           retention-days: 30
 
+      # The three platform jobs race to create the release, the losers
+      # just upload into it.
+      - name: Publish release.
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1 \
+            || gh release create "$TAG" -R "$GITHUB_REPOSITORY" --verify-tag \
+              --title "NoxGram $TAG" \
+              --notes "NoxGram build for testing. macOS: unpack, move to Applications, right-click and choose Open (the app is not notarized)." \
+            || true
+          gh release upload "$TAG" "$REPO_NAME/out/$CONFIG/artifact/NoxGram-macos.zip" -R "$GITHUB_REPOSITORY" --clobber
