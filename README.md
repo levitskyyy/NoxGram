@@ -17,6 +17,7 @@ NoxGram stands on the work of these projects:
 | [Telegram Desktop](https://github.com/telegramdesktop/tdesktop) | The whole client, protocol and UI ([GPLv3](LICENSE), [legal notices](LEGAL)) |
 | [Nagram Desktop](https://github.com/NextAlone/Nagram-Qt) by NextAlone and contributors | The base of this fork: every Nagram feature, the settings system, translations and build setup |
 | [AyuGram Desktop](https://github.com/AyuGram/AyuGramDesktop) by the AyuGram team | The design of ghost mode and spy mode: which requests to suppress, where to hook them, and how deleted and edited messages are kept (GPLv3) |
+| [tg-ws-proxy](https://github.com/Flowseal/tg-ws-proxy) by Flowseal | The idea and endpoints of the WebSocket connection: MTProto inside a WebSocket to `kwsN.web.telegram.org` (MIT) |
 
 The ghost and spy mode code in `Telegram/SourceFiles/noxgram/` was written for
 NoxGram against the Nagram code base, following AyuGram's implementation. All
@@ -59,6 +60,17 @@ from another device, are not kept.
 
 Ghost mode only stops the client from sending these signals. People can still
 notice indirect signs, for example a reply to a message they see as unread.
+
+## WebSocket connection
+
+Settings → NoxGram → Connection → "Connect through web.telegram.org". The
+MTProto stream then goes inside a WebSocket over TLS to Telegram's own web
+servers (`wss://kwsN.web.telegram.org/apiws`), the way Telegram Web connects,
+so to the network it looks like ordinary HTTPS. The server certificate is
+verified and the MTProto encryption inside is unchanged. It is built into the
+client's network layer, no local proxy runs. If web.telegram.org can't be
+reached, NoxGram falls back to a direct connection unless that is turned off.
+The setting does not apply while a proxy is configured.
 
 ## Building
 
