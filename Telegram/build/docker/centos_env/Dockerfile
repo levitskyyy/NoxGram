@@ -374,6 +374,12 @@ FROM builder AS rnnoise
 RUN --mount=type=cache,target=/var/cache/ccache <<EOF
 git clone -b v0.2 --depth=1 https://github.com/xiph/rnnoise.git
 cd rnnoise
+# The NEON code of v0.2 includes a header that the release lacks.
+[ -f src/os_support.h ] || printf '%s\n' \
+	'#include <string.h>' \
+	'#define OPUS_INLINE inline' \
+	'#define OPUS_CLEAR(dst, n) (memset((dst), 0, (n)*sizeof(*(dst))))' \
+	> src/os_support.h
 ./autogen.sh
 ./configure --enable-static --disable-shared
 make -j$(nproc)
