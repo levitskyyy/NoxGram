@@ -27,6 +27,8 @@ if (APPLE)
     enable_language(OBJC OBJCXX)
 endif()
 
+include(Telegram/cmake/noxgram_build_cache.cmake)
+
 if (configuration_types_init
     AND CMAKE_CONFIGURATION_TYPES
     AND NOT MinSizeRel IN_LIST CMAKE_CONFIGURATION_TYPES)
