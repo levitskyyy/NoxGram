@@ -70,6 +70,12 @@ const auto kMeta = BuildHelper({
 		.keywords = { u"ghost"_q, u"spy"_q, u"deleted"_q, u"stealth"_q },
 	});
 	builder.addSectionButton({
+		.title = tr::lng_nox_connection(),
+		.targetSection = Nox::ConnectionId(),
+		.icon = { &st::menuIconNetwork },
+		.keywords = { u"websocket"_q, u"connection"_q, u"blocking"_q },
+	});
+	builder.addSectionButton({
 		.title = tr::lng_nagram_interface(),
 		.targetSection = InterfaceId(),
 		.icon = { &st::menuIconPalette },

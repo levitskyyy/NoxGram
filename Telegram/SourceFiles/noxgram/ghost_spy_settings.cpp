@@ -146,10 +146,55 @@ const auto kMeta = BuildHelper({
 
 const SectionBuildMethod GhostSpySection::kBuild = kMeta.build;
 
+class ConnectionSection final : public Section<ConnectionSection> {
+public:
+	ConnectionSection(
+		QWidget *parent,
+		not_null<Window::SessionController*> controller)
+	: Section(parent, controller) {
+		const auto content = Ui::CreateChild<Ui::VerticalLayout>(this);
+		build(content, kBuild);
+		Ui::ResizeFitChild(this, content);
+	}
+
+	[[nodiscard]] rpl::producer<QString> title() override {
+		return tr::lng_nox_connection();
+	}
+
+	static const SectionBuildMethod kBuild;
+};
+
+const auto kConnectionMeta = BuildHelper({
+	.id = ConnectionSection::Id(),
+	.parentId = Nagram::HomeId(),
+	.title = &tr::lng_nox_connection,
+	.icon = &st::menuIconNetwork,
+}, [](SectionBuilder &builder) {
+	builder.addSubsectionTitle(tr::lng_nox_ws_title());
+	AddToggle(builder, kWsTransport,
+		tr::lng_nox_ws_transport(),
+		u"noxgram/connection/websocket"_q,
+		{ u"websocket"_q, u"web"_q, u"proxy"_q, u"blocking"_q, u"dpi"_q },
+		&st::settingsButton,
+		{ &st::menuIconNetwork });
+	builder.addDividerText(tr::lng_nox_ws_transport_about());
+	AddToggle(builder, kWsDirectFallback,
+		tr::lng_nox_ws_direct_fallback(),
+		u"noxgram/connection/direct-fallback"_q,
+		{ u"websocket"_q, u"direct"_q, u"fallback"_q });
+	builder.addDividerText(tr::lng_nox_ws_direct_fallback_about());
+});
+
+const SectionBuildMethod ConnectionSection::kBuild = kConnectionMeta.build;
+
 } // namespace
 
 Settings::Type GhostSpyId() {
 	return GhostSpySection::Id();
+}
+
+Settings::Type ConnectionId() {
+	return ConnectionSection::Id();
 }
 
 } // namespace Nox

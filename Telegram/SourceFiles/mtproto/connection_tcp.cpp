@@ -9,6 +9,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "mtproto/details/mtproto_abstract_socket.h"
 #include "mtproto/details/mtproto_web_proxy_socket.h"
+#include "mtproto/details/mtproto_websocket.h"
 #include "base/bytes.h"
 #include "base/openssl_help.h"
 #include "base/random.h"
@@ -250,14 +251,20 @@ auto TcpConnection::Protocol::Create(bytes::const_span secret)
 TcpConnection::TcpConnection(
 	not_null<Instance*> instance,
 	QThread *thread,
-	const ProxyData &proxy)
+	const ProxyData &proxy,
+	bool webSocket)
 : AbstractConnection(thread, proxy)
 , _instance(instance)
-, _checkNonce(base::RandomValue<MTPint128>()) {
+, _checkNonce(base::RandomValue<MTPint128>())
+, _webSocket(webSocket) {
 }
 
 ConnectionPointer TcpConnection::clone(const ProxyData &proxy) {
-	return ConnectionPointer::New<TcpConnection>(_instance, thread(), proxy);
+	return ConnectionPointer::New<TcpConnection>(
+		_instance,
+		thread(),
+		proxy,
+		_webSocket);
 }
 
 void TcpConnection::ensureAvailableInBuffer(int amount) {
@@ -523,7 +530,11 @@ void TcpConnection::connectToServer(
 	const auto secret = proxyProtocol
 		? _proxy.secretFromMtprotoPassword()
 		: protocolSecret;
-	if (proxyProtocol) {
+	if (_webSocket) {
+		_address = WebSocket::HostForDc(protocolDcId, protocolForFiles);
+		_port = 443;
+		_protocol = Protocol::Create(secret);
+	} else if (proxyProtocol) {
 		_address = _proxy.host;
 		_port = _proxy.port;
 		_protocol = Protocol::Create(secret);
@@ -532,7 +543,12 @@ void TcpConnection::connectToServer(
 		_port = port;
 		_protocol = Protocol::Create(secret);
 	}
-	_socket = (_proxy.type == ProxyData::Type::Web)
+	_socket = _webSocket
+		? std::make_unique<WebSocket>(
+			thread(),
+			protocolDcId,
+			protocolForFiles)
+		: (_proxy.type == ProxyData::Type::Web)
 		? std::make_unique<WebProxySocket>(thread(), _proxy)
 		: AbstractSocket::Create(
 			thread(),
@@ -657,6 +673,9 @@ QString TcpConnection::transport() const {
 }
 
 QString TcpConnection::tag() const {
+	if (_webSocket) {
+		return u"WebSocket"_q;
+	}
 	auto result = u"TCP"_q;
 	if (qthelp::is_ipv6(_address)) {
 		result += u"/IPv6"_q;

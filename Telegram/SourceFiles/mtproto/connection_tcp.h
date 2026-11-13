@@ -17,10 +17,13 @@ class AbstractSocket;
 
 class TcpConnection : public AbstractConnection {
 public:
+	// With webSocket the obfuscated stream goes inside a WebSocket to
+	// web.telegram.org instead of a direct TCP connection to the DC.
 	TcpConnection(
 		not_null<Instance*> instance,
 		QThread *thread,
-		const ProxyData &proxy);
+		const ProxyData &proxy,
+		bool webSocket = false);
 
 	ConnectionPointer clone(const ProxyData &proxy) override;
 
@@ -81,6 +84,7 @@ private:
 	class Protocol;
 	std::unique_ptr<Protocol> _protocol;
 	int16 _protocolDcId = 0;
+	bool _webSocket = false;
 
 	Status _status = Status::Waiting;
 	MTPint128 _checkNonce;

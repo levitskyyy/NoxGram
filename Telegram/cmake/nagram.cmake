@@ -158,6 +158,7 @@ set(nagram_sources
     noxgram/ghost.cpp
     noxgram/ghost_spy_settings.cpp
     noxgram/spy.cpp
+    noxgram/ws_transport.cpp
 )
 
 if (nagram_sources)

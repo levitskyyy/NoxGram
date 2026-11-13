@@ -33,3 +33,10 @@ NoxGram: русский перевод.
 "lng_nox_spy_deleted_at" = "удалено {date}";
 "lng_nox_spy_empty_text" = "(без текста)";
 "lng_nox_spy_clear" = "Очистить";
+
+"lng_nox_connection" = "Подключение";
+"lng_nox_ws_title" = "Подключение через WebSocket";
+"lng_nox_ws_transport" = "Подключаться через web.telegram.org";
+"lng_nox_ws_transport_about" = "Трафик MTProto идёт внутри защищённого WebSocket (TLS) к собственным веб-серверам Telegram, так же как подключается Telegram Web. Для сети это выглядит как обычный HTTPS, что помогает там, где прямое подключение к Telegram блокируют или замедляют. Сообщения, как обычно, зашифрованы MTProto. Не действует, пока включён прокси.";
+"lng_nox_ws_direct_fallback" = "Резервное прямое подключение";
+"lng_nox_ws_direct_fallback_about" = "Если web.telegram.org недоступен, подключаться к Telegram напрямую. Выключите, чтобы никогда не подключаться напрямую.";

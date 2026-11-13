@@ -13,4 +13,7 @@ namespace Nox {
 // "Ghost and spy mode" section inside the Nagram settings.
 [[nodiscard]] Settings::Type GhostSpyId();
 
+// "Connection" section: the WebSocket transport.
+[[nodiscard]] Settings::Type ConnectionId();
+
 } // namespace Nox

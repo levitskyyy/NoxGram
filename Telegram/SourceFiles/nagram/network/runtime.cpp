@@ -1,6 +1,7 @@
 #include "nagram/network/runtime.h"
 
 #include "nagram/network/options.h"
+#include "noxgram/ws_transport.h"
 #include "core/application.h"
 #include "lang/lang_keys.h"
 #include "main/main_account.h"
@@ -54,6 +55,7 @@ void EnsureStarted() {
 		return;
 	}
 	started = true;
+	Nox::WsTransport::Start();
 	// WHY: session threads can't read Core::Settings, so the main thread
 	// mirrors the value here before the first session is configured.
 	auto &options = ForDevice();

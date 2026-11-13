@@ -66,6 +66,14 @@ inline constexpr auto kKeepSelfDestructing = Option<bool>{
 	"nagram.nox.keepSelfDestructing", Scope::Device, true,
 	Category::Privacy, "lng_nox_keep_self_destructing" };
 
+// Connection: MTProto inside a WebSocket to web.telegram.org.
+inline constexpr auto kWsTransport = Option<bool>{
+	"nagram.nox.wsTransport", Scope::Device, false,
+	Category::Network, "lng_nox_ws_transport" };
+inline constexpr auto kWsDirectFallback = Option<bool>{
+	"nagram.nox.wsDirectFallback", Scope::Device, true,
+	Category::Network, "lng_nox_ws_direct_fallback" };
+
 inline void RegisterOptions(Nagram::Registry &registry) {
 	Expects(registry.Add(kGhostMode));
 	Expects(registry.Add(kGhostHideRead));
@@ -80,6 +88,8 @@ inline void RegisterOptions(Nagram::Registry &registry) {
 	Expects(registry.Add(kSaveEdits));
 	Expects(registry.Add(kSaveForBots));
 	Expects(registry.Add(kKeepSelfDestructing));
+	Expects(registry.Add(kWsTransport));
+	Expects(registry.Add(kWsDirectFallback));
 }
 
 } // namespace Nox

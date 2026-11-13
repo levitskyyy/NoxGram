@@ -23,6 +23,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/unixtime.h"
 #include "base/platform/base_platform_info.h"
 #include "nagram/network/runtime.h"
+#include "noxgram/ws_transport.h"
+#include "mtproto/connection_tcp.h"
 
 #include <ksandbox.h>
 #include <zlib.h>
@@ -33,6 +35,7 @@ namespace {
 
 constexpr auto kIntSize = static_cast<int>(sizeof(mtpPrime));
 constexpr auto kWaitForBetterTimeout = crl::time(2000);
+constexpr auto kWebSocketPriority = 100;
 constexpr auto kMinConnectedTimeout = crl::time(1000);
 constexpr auto kMaxConnectedTimeout = crl::time(8000);
 constexpr auto kMinReceiveTimeout = crl::time(4000);
@@ -198,19 +201,30 @@ void SessionPrivate::appendTestConnection(
 		DcOptions::Variants::Protocol protocol,
 		const QString &ip,
 		int port,
-		const bytes::vector &protocolSecret) {
+		const bytes::vector &protocolSecret,
+		bool webSocket) {
 	QWriteLocker lock(&_stateMutex);
 
-	const auto priority = (qthelp::is_ipv6(ip) ? (Nagram::Network::PreferIPv6(OptionPreferIPv6.value()) ? 2 : 0) : 1)
+	// The WebSocket connection outranks every direct one: they only
+	// serve as the fallback while it can't connect.
+	const auto priority = webSocket
+		? kWebSocketPriority
+		: (qthelp::is_ipv6(ip) ? (Nagram::Network::PreferIPv6(OptionPreferIPv6.value()) ? 2 : 0) : 1)
 		+ (protocol == DcOptions::Variants::Tcp ? 1 : 0)
 		+ (protocolSecret.empty() ? 0 : 1);
 	_testConnections.push_back({
-		AbstractConnection::Create(
-			_instance,
-			protocol,
-			thread(),
-			protocolSecret,
-			_options->proxy),
+		(webSocket
+			? ConnectionPointer::New<TcpConnection>(
+				_instance,
+				thread(),
+				_options->proxy,
+				true)
+			: AbstractConnection::Create(
+				_instance,
+				protocol,
+				thread(),
+				protocolSecret,
+				_options->proxy)),
 		priority
 	});
 	const auto weak = _testConnections.back().data.get();
@@ -1038,6 +1052,14 @@ void SessionPrivate::connectToServer(bool afterConfig) {
 		appendTestConnection(DcOptions::Variants::Tcp, {}, 0, {});
 	} else {
 		using Variants = DcOptions::Variants;
+		// CDN DCs have no web endpoints and are reached directly.
+		const auto webSocket = Nox::WsTransport::Enabled()
+			&& (_options->proxy.type == ProxyData::Type::None)
+			&& (_currentDcType != DcType::Cdn);
+		if (webSocket) {
+			appendTestConnection(Variants::Tcp, {}, 0, {}, true);
+		}
+		const auto direct = !webSocket || Nox::WsTransport::DirectFallback();
 		const auto special = (_currentDcType == DcType::Temporary);
 		const auto variants = _instance->dcOptions().lookup(
 			bareDc,
@@ -1057,7 +1079,7 @@ void SessionPrivate::connectToServer(bool afterConfig) {
 			: !useHttp
 			? Variants::Http
 			: Variants::ProtocolCount;
-		for (auto address = 0; address != Variants::AddressTypeCount; ++address) {
+		for (auto address = 0; direct && address != Variants::AddressTypeCount; ++address) {
 			if (address == skipAddress) {
 				continue;
 			}
@@ -2397,6 +2419,7 @@ void SessionPrivate::onConnected(
 		DEBUG_LOG(("MTP Info: connection through IPv4 succeed."));
 		_waitForBetterTimer.cancel();
 		_connection = std::move(i->data);
+		LOG(("MTP Info: dc %1 uses %2.").arg(_shiftedDcId).arg(_connection->tag()));
 		_testConnections.clear();
 		checkAuthKey();
 	}
@@ -2434,6 +2457,7 @@ void SessionPrivate::confirmBestConnection() {
 
 	_connection = std::move(i->data);
 	_testConnections.clear();
+	LOG(("MTP Info: dc %1 uses %2.").arg(_shiftedDcId).arg(_connection->tag()));
 
 	checkAuthKey();
 }
