@@ -27,7 +27,8 @@ inline constexpr auto kUntranslocatedArgument = "-untranslocated";
 
 // Returns false when startup must stop right away: the process was
 // started by macOS from a read-only translocated copy of the bundle and
-// either relaunched itself from the original location or told the user.
+// either relaunched itself from the original location or, for a portable
+// build, told the user.
 [[nodiscard]] bool CheckAppTranslocation();
 
 // NAGRAM: false when the bundle was renamed to its current name and relaunched.
