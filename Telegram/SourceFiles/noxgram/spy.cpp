@@ -417,9 +417,9 @@ bool IgnoresExpiredEdit(
 		return true;
 	}
 	return incoming->match([](const MTPDmessageMediaPhoto &data) {
-		return !data.vphoto().has_value();
+		return !data.vphoto();
 	}, [](const MTPDmessageMediaDocument &data) {
-		return !data.vdocument().has_value();
+		return !data.vdocument();
 	}, [](const auto &) {
 		return true;
 	});
