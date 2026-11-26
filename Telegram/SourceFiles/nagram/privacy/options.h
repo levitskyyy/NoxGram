@@ -31,7 +31,7 @@ inline constexpr auto kHideSendStatus = Option<bool>{
 }
 
 inline constexpr auto kForceCopy = Option<bool>{
-	"nagram.forceCopy", Scope::Device, false,
+	"nagram.forceCopy", Scope::Device, true,
 	Category::Privacy, "lng_nagram_force_copy",
 	static_cast<unsigned>(Flag::RefreshMessageView) };
 inline constexpr auto kIgnoreContentRestrictions = Option<bool>{
