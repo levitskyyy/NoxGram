@@ -248,8 +248,8 @@ void ShowTranslocationError() {
 
 	NSAlert *alert = [[NSAlert alloc] init];
 	alert.alertStyle = NSAlertStyleCritical;
-	alert.messageText = @"Nagram Desktop can't start from here";
-	alert.informativeText = @"macOS started this copy of Nagram Desktop "
+	alert.messageText = @"NoxGram Desktop can't start from here";
+	alert.informativeText = @"macOS started this copy of NoxGram Desktop "
 		@"from a read-only temporary location (App Translocation), so it "
 		@"can't use its own folder. Please reinstall the app and launch it "
 		@"again.";
@@ -273,14 +273,14 @@ void finish() {
 }
 
 // macOS starts a quarantined bundle that was never moved by Finder from
-// a random read-only mount, so a portable build loses the
-// NagramForcePortable folder it was shipped with and silently works on
-// the default installation's data. When the original location is known
-// and is the shipped portable layout, stripping the quarantine attribute
-// there is exactly what a Finder move would have done (Gatekeeper has
-// already assessed and allowed this launch), and the original can be
-// relaunched in place. Anything else is a hard stop: moving the parent
-// folder does not help and the user has to reinstall.
+// a random read-only mount. NoxGram is shipped unsigned as a zip, so this
+// is how almost every first launch looks. When the original location is
+// known, stripping the quarantine attribute there is exactly what a Finder
+// move would have done (Gatekeeper has already assessed and allowed this
+// launch), and the original can be relaunched in place. If that fails, a
+// regular build still works from the translocated copy, its data lives in
+// Application Support; only a portable build, which would lose its
+// NoxGramForcePortable folder and silently use the default data, stops.
 bool CheckAppTranslocation() {
 #ifdef OS_MAC_STORE
 	// Installed by the App Store: never quarantined, never translocated,
@@ -307,14 +307,20 @@ bool CheckAppTranslocation() {
 	const auto portable = !state.original.isEmpty()
 		&& QFileInfo(state.original + u"/Contents/Info.plist"_q).isFile()
 		&& QDir(QFileInfo(state.original).path()
-			+ u"/NagramForcePortable"_q).exists();
+			+ u"/NoxGramForcePortable"_q).exists();
+	const auto bundled = !state.original.isEmpty()
+		&& QFileInfo(state.original + u"/Contents/Info.plist"_q).isFile();
 	if (!relaunched
-		&& portable
+		&& bundled
 		&& RemoveQuarantineRecursively(state.original)
 		&& RelaunchUntranslocated(state.original)) {
 		LOG(("Translocation Info: relaunched from '%1'."
 			).arg(state.original));
 		return false;
+	}
+	if (!portable) {
+		LOG(("Translocation Info: running translocated."));
+		return true;
 	}
 	ShowTranslocationError();
 	return false;

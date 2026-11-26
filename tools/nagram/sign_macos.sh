@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Sign a built Nagram Desktop.app, or the disk image that holds it, for distribution
+# Sign a built NoxGram Desktop.app, or the disk image that holds it, for distribution
 # outside the App Store.
 #
-# Usage: sign_macos.sh <Nagram Desktop.app> <entitlements>
+# Usage: sign_macos.sh <NoxGram Desktop.app> <entitlements>
 #        sign_macos.sh <Nagram.dmg>
 # With the certificate and one set of notary credentials the bundle is signed
 # with the Developer ID certificate under the hardened runtime, notarized and
@@ -32,8 +32,8 @@ elif [ $# -eq 2 ] && [ -d "$1/Contents/MacOS" ] && [ -f "$2" ]; then
 	app=$1
 	entitlements=$2
 else
-	echo "Usage: $0 <Nagram Desktop.app> <entitlements>" >&2
-	echo "       $0 <Nagram.dmg>" >&2
+	echo "Usage: $0 <NoxGram Desktop.app> <entitlements>" >&2
+	echo "       $0 <NoxGram.dmg>" >&2
 	exit 2
 fi
 
