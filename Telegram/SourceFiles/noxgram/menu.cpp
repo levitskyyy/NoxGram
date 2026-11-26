@@ -21,7 +21,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item.h"
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
+#include "data/data_peer_id.h"
 #include "nagram/chats/top_bar_actions.h"
+#include "nagram/core/options.h"
+#include "nagram/filters/model.h"
 #include "noxgram/ghost.h"
 #include "noxgram/lang.h"
 #include "noxgram/spy.h"
@@ -30,6 +33,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/window_session_controller.h"
 #include "styles/style_layers.h"
 #include "styles/style_menu_icons.h"
+
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 namespace Nox::Menu {
 namespace {
@@ -236,6 +243,54 @@ void AddDeleteMine(
 	});
 }
 
+[[nodiscard]] QJsonObject FilterRules(not_null<Main::Session*> session) {
+	const auto raw = Nagram::ForAccount(session).Get(Nagram::Filters::kRules);
+	return (raw.isEmpty() || !Nagram::Filters::Validate(raw))
+		? Nagram::Filters::Defaults()
+		: QJsonDocument::fromJson(raw).object();
+}
+
+[[nodiscard]] bool ShadowBanned(not_null<PeerData*> peer) {
+	const auto author = QString::number(SerializePeerId(peer->id));
+	return FilterRules(&peer->session()).value(
+		u"hiddenAuthors"_q).toArray().contains(author);
+}
+
+void AddShadowBan(
+		const Ui::Menu::MenuCallback &addAction,
+		not_null<Window::SessionController*> controller,
+		not_null<PeerData*> peer) {
+	if (peer->isSelf() || peer->isChat() || peer->isMegagroup()) {
+		return;
+	}
+	const auto banned = ShadowBanned(peer);
+	addAction(Nox::TrNow(banned
+		? u"lng_nox_shadow_unban"_q
+		: u"lng_nox_shadow_ban"_q), crl::guard(controller, [=] {
+		const auto session = &peer->session();
+		const auto author = QString::number(SerializePeerId(peer->id));
+		auto rules = FilterRules(session);
+		auto authors = rules.value(u"hiddenAuthors"_q).toArray();
+		const auto index = authors.toVariantList().indexOf(author);
+		if (index >= 0) {
+			authors.removeAt(index);
+		} else {
+			authors.push_back(author);
+			rules.insert(u"enabled"_q, true);
+		}
+		rules.insert(u"hiddenAuthors"_q, authors);
+		const auto bytes = QJsonDocument(rules).toJson(
+			QJsonDocument::Compact);
+		if (Nagram::ForAccount(session).Set(
+				Nagram::Filters::kRules,
+				bytes)) {
+			controller->showToast(Nox::TrNow((index >= 0)
+				? u"lng_nox_shadow_unbanned"_q
+				: u"lng_nox_shadow_banned"_q));
+		}
+	}), &st::menuIconBlock);
+}
+
 } // namespace
 
 void AddMessageActions(
@@ -260,6 +315,7 @@ void AddPeerActions(
 	AddJumpToBeginning(addAction, controller, peer);
 	AddOpenLinkedChannel(addAction, controller, peer);
 	Spy::AddPeerMenu(addAction, controller, peer);
+	AddShadowBan(addAction, controller, peer);
 	AddDeleteMine(addAction, controller, peer);
 }
 
