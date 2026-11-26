@@ -260,6 +260,11 @@ const auto kMeta = BuildHelper({
 		Nox::Tr(u"lng_nox_keep_self_destructing"_q),
 		u"noxgram/spy/keep-self-destructing"_q,
 		{ u"self-destruct"_q, u"timer"_q, u"spy"_q });
+	AddToggle(builder, kKeepViewOnce,
+		Nox::Tr(u"lng_nox_keep_view_once"_q),
+		u"noxgram/spy/keep-view-once"_q,
+		{ u"view once"_q, u"self-destruct"_q, u"timer"_q, u"photo"_q });
+	builder.addDividerText(Nox::Tr(u"lng_nox_keep_view_once_about"_q));
 	AddToggle(builder, kSaveForBots,
 		Nox::Tr(u"lng_nox_save_for_bots"_q),
 		u"noxgram/spy/save-for-bots"_q,

@@ -149,7 +149,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtWidgets/QApplication>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMimeData>
-#include "noxgram/spy.h"
+#include "noxgram/menu.h"
 
 namespace {
 
@@ -3130,7 +3130,7 @@ void HistoryInner::showContextMenu(QContextMenuEvent *e, bool showFromTouch) {
 			}, &st::menuIconEdit);
 			Nagram::Menu::Tag(_menu->actions().back(), Nagram::Menu::ActionId::Edit);
 		}
-		Nox::Spy::AddMessageActions(_menu.get(), _controller, item);
+		Nox::Menu::AddMessageActions(_menu.get(), _controller, item);
 		if (session->factchecks().canEdit(item)) {
 			const auto text = item->factcheckText();
 			const auto phrase = text.empty()

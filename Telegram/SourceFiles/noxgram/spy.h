@@ -35,6 +35,12 @@ namespace Nox::Spy {
 
 void RememberEdit(not_null<HistoryItem*> item, const QString &newText);
 
+[[nodiscard]] bool KeepsViewOnce();
+void RememberViewOnce(not_null<HistoryItem*> item);
+[[nodiscard]] bool IgnoresExpiredEdit(
+	not_null<HistoryItem*> item,
+	const MTPMessage &data);
+
 [[nodiscard]] bool HasEdits(not_null<HistoryItem*> item);
 
 void ShowEditHistory(

@@ -12,6 +12,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/unixtime.h"
 #include "core/file_utilities.h"
+#include "data/data_media_types.h"
 #include "data/data_peer.h"
 #include "data/data_session.h"
 #include "data/data_user.h"
@@ -372,6 +373,49 @@ void RememberEdit(not_null<HistoryItem*> item, const QString &newText) {
 	const auto date = (edited && edited->date) ? edited->date : item->date();
 	DatabaseFor(&item->history()->session()).addEdit(
 		MakeRecord(item, old, date));
+}
+
+bool KeepsViewOnce() {
+	return Get(kKeepViewOnce);
+}
+
+void RememberViewOnce(not_null<HistoryItem*> item) {
+	if (!item->isRegular() || item->out()) {
+		return;
+	}
+	auto record = MakeRecord(item, item->originalText(), item->date());
+	record.expired = true;
+	record.media = KindOf(item);
+	record.mediaName = MediaName(item);
+	record.mediaMime = MediaMime(item);
+	record.mediaSize = MediaSize(item);
+	DatabaseFor(&item->history()->session()).addDeleted(std::move(record));
+	SaveMedia(item);
+}
+
+bool IgnoresExpiredEdit(
+		not_null<HistoryItem*> item,
+		const MTPMessage &data) {
+	const auto media = item->media();
+	if (!KeepsViewOnce()
+		|| item->out()
+		|| !media
+		|| !media->ttlSeconds()
+		|| data.type() != mtpc_message) {
+		return false;
+	}
+	const auto &fields = data.c_message();
+	const auto incoming = fields.vmedia();
+	if (!incoming) {
+		return true;
+	}
+	return incoming->match([](const MTPDmessageMediaPhoto &data) {
+		return !data.vphoto().has_value();
+	}, [](const MTPDmessageMediaDocument &data) {
+		return !data.vdocument().has_value();
+	}, [](const auto &) {
+		return true;
+	});
 }
 
 bool HasEdits(not_null<HistoryItem*> item) {

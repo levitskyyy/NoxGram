@@ -21,7 +21,7 @@ NoxGram strings. Ghost mode and spy mode are modelled on AyuGram Desktop
 "lng_nox_spy_title" = "Spy mode";
 "lng_nox_save_deleted" = "Keep deleted messages";
 "lng_nox_save_edits" = "Keep edit history";
-"lng_nox_keep_self_destructing" = "Keep self-destructing messages";
+"lng_nox_keep_self_destructing" = "Keep auto-deleting messages";
 "lng_nox_save_for_bots" = "Also in chats with bots";
 "lng_nox_spy_about" = "Messages deleted by others stay in the chat with a “deleted” mark until restart. Their text, photos and files and the previous versions of edited messages are saved on this device only, in a database in the tdata folder, and open from the chat menu and the message menu.";
 "lng_nox_deleted_mark" = "deleted";
@@ -53,3 +53,12 @@ NoxGram strings. Ghost mode and spy mode are modelled on AyuGram Desktop
 "lng_nox_spy_media_show" = "Show in folder";
 "lng_nox_spy_expired_at" = "self-destructed {date}";
 "lng_nox_spy_load_more" = "Show earlier";
+"lng_nox_keep_view_once" = "Keep view-once and timed media";
+"lng_nox_keep_view_once_about" = "View-once and self-destructing photos, videos and voice messages stay in the chat after viewing, marked with 🔥, and can be opened again and saved. A copy goes to the saved messages. With ghost mode the sender is not told they were opened.";
+"lng_nox_read_until" = "Read up to here";
+"lng_nox_burn" = "Mark as viewed for the sender";
+"lng_nox_jump_to_beginning" = "Jump to the beginning";
+"lng_nox_open_linked_channel" = "Open the channel";
+"lng_nox_delete_mine" = "Delete my messages";
+"lng_nox_delete_mine_sure" = "Delete all your messages in this chat for everyone? This can't be undone.";
+"lng_nox_delete_mine_done" = "Deleted your messages: {count}.";

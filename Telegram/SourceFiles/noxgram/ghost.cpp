@@ -170,6 +170,32 @@ void MarkReadAfterAction(not_null<History*> history) {
 	NoteActivity(&history->session());
 }
 
+void ReadUntil(not_null<HistoryItem*> item) {
+	const auto history = item->history();
+	history->inboxRead(item);
+	ReadTill(history, item->id);
+}
+
+void ReadContents(not_null<HistoryItem*> item) {
+	const auto session = &item->history()->session();
+	const auto ids = MTP_vector<MTPint>(1, MTP_int(item->id));
+	if (const auto channel = item->history()->peer->asChannel()) {
+		session->api().request(MTPchannels_ReadMessageContents(
+			channel->inputChannel(),
+			ids
+		)).send();
+	} else {
+		session->api().request(MTPmessages_ReadMessageContents(
+			ids
+		)).done([=, peer = item->history()->peer](
+				const MTPmessages_AffectedMessages &result) {
+			session->api().applyAffectedMessages(peer, result);
+		}).send();
+	}
+	item->markContentsRead();
+	NoteActivity(session);
+}
+
 void ApplyScheduling(
 		not_null<Main::Session*> session,
 		Api::SendOptions &options,

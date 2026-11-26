@@ -10,6 +10,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/event_filter.h"
 #include "core/application.h"
 #include "core/core_screenshot_protection.h"
+#include "noxgram/spy.h"
 #include "data/data_document.h"
 #include "data/data_session.h"
 #include "editor/editor_layer_widget.h"
@@ -386,7 +387,7 @@ void ShowTTLMediaLayerWidget(
 	layer->lifetime().add([] { ::Media::Player::instance()->stop(); });
 	Core::App().screenshotProtection().addContentReason(
 		controller->widget(),
-		rpl::single(true),
+		rpl::single(!Nox::Spy::KeepsViewOnce()),
 		layer->lifetime());
 	base::install_event_filter(layer.get(), [=](not_null<QEvent*> e) {
 		if (e->type() == QEvent::KeyPress) {

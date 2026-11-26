@@ -112,7 +112,9 @@ template <typename T>
 [[nodiscard]] bool ShowTtlMediaAsExpired(
 		not_null<HistoryItem*> item,
 		const MTPMessageMedia &media) {
-	if (item->out() || item->hasUnreadMediaFlag()) {
+	if (item->out()
+		|| item->hasUnreadMediaFlag()
+		|| Nox::Spy::KeepsViewOnce()) {
 		return false;
 	}
 	return media.match([](const MTPDmessageMediaPhoto &data) {
@@ -1921,6 +1923,9 @@ bool HistoryItem::isTtlCoveredMedia() const {
 	const auto media = _media.get();
 	if (!media || !media->ttlSeconds()) {
 		return false;
+	} else if (_noxBurnt
+		|| (Nox::Spy::KeepsViewOnce() && !out() && !isUnreadMedia())) {
+		return false;
 	} else if (media->photo()) {
 		return true;
 	} else if (const auto document = media->document()) {
@@ -3120,6 +3125,15 @@ void HistoryItem::clearMediaAsExpired() {
 		return;
 	}
 	unarmMediaDestroy();
+	if (!out() && Nox::Spy::KeepsViewOnce()) {
+		RemoveComponents(HistoryServiceSelfDestruct::Bit());
+		if (!_noxBurnt) {
+			_noxBurnt = true;
+			Nox::Spy::RememberViewOnce(this);
+		}
+		_history->owner().requestItemViewRefresh(this);
+		return;
+	}
 	auto &owner = _history->owner();
 	const auto wasServiceMessage = _isServiceMessage;
 	if (const auto document = media->document()) {
@@ -3562,7 +3576,9 @@ bool HistoryItem::forbidsForward() const {
 bool HistoryItem::forbidsSaving() const {
 	if (Nagram::Privacy::ForbidsCopy(this)) {
 		return true;
-	} else if (_media && _media->ttlSeconds()) {
+	} else if (_media
+		&& _media->ttlSeconds()
+		&& (out() || !Nox::Spy::KeepsViewOnce())) {
 		return true;
 	} else if (const auto invoice = _media ? _media->invoice() : nullptr) {
 		return HasExtendedMedia(*invoice);

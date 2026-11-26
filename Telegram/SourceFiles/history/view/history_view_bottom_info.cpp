@@ -510,9 +510,11 @@ void BottomInfo::layoutDateText() {
 			& (Data::Flag::ForwardedDate | Data::Flag::FullDate))
 		? Nagram::Messages::FormatSavedFrom(_data.date)
 		: Nagram::Messages::FormatTime(_data.date.time()));
-	const auto deleted = (_data.flags & Data::Flag::NoxDeleted)
+	const auto deleted = ((_data.flags & Data::Flag::NoxBurnt)
+		? (QString::fromUtf8("\xF0\x9F\x94\xA5") + ' ')
+		: QString()) + ((_data.flags & Data::Flag::NoxDeleted)
 		? (Nox::Spy::DeletedMark() + ' ')
-		: QString();
+		: QString());
 	const auto date = Nagram::Messages::WithBubbleId(
 		deleted + plainDate,
 		_data);
@@ -716,6 +718,9 @@ BottomInfo::Data BottomInfoDataFromMessage(not_null<Message*> message) {
 	}
 	if (item->isNoxDeleted()) {
 		result.flags |= Flag::NoxDeleted;
+	}
+	if (item->isNoxBurnt()) {
+		result.flags |= Flag::NoxBurnt;
 	}
 	if (IsAnchoredEphemeral(item)) {
 		result.flags |= Flag::Updated;

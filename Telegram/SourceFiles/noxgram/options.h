@@ -65,6 +65,9 @@ inline constexpr auto kSaveForBots = Option<bool>{
 inline constexpr auto kKeepSelfDestructing = Option<bool>{
 	"nagram.nox.keepSelfDestructing", Scope::Device, true,
 	Category::Privacy, "lng_nox_keep_self_destructing" };
+inline constexpr auto kKeepViewOnce = Option<bool>{
+	"nagram.nox.keepViewOnce", Scope::Device, true,
+	Category::Privacy, "lng_nox_keep_view_once", kRefreshView };
 inline constexpr auto kSaveDeletedMedia = Option<bool>{
 	"nagram.nox.saveDeletedMedia", Scope::Device, true,
 	Category::Privacy, "lng_nox_save_deleted_media" };
@@ -95,6 +98,7 @@ inline void RegisterOptions(Nagram::Registry &registry) {
 	Expects(registry.Add(kSaveEdits));
 	Expects(registry.Add(kSaveForBots));
 	Expects(registry.Add(kKeepSelfDestructing));
+	Expects(registry.Add(kKeepViewOnce));
 	Expects(registry.Add(kSaveDeletedMedia));
 	Expects(registry.Add(kDeletedMediaLimit));
 	Expects(registry.Add(kWsTransport));

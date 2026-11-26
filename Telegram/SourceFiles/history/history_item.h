@@ -464,6 +464,9 @@ public:
 	[[nodiscard]] bool isNoxDeleted() const {
 		return _noxDeleted;
 	}
+	[[nodiscard]] bool isNoxBurnt() const {
+		return _noxBurnt;
+	}
 	[[nodiscard]] const TextWithEntities &translatedText() const;
 	[[nodiscard]] TextWithEntities translatedTextWithLocalEntities() const;
 	[[nodiscard]] const std::vector<ClickHandlerPtr> &customTextLinks() const;
@@ -835,6 +838,7 @@ private:
 	TextWithEntities _text;
 	bool _nagramOriginalShown = false;
 	bool _noxDeleted = false;
+	bool _noxBurnt = false;
 
 	std::unique_ptr<Data::Media> _media;
 	std::unique_ptr<Data::MessageReactions> _reactions;

@@ -50,6 +50,7 @@ public:
 			FullDate       = 0x4000,
 			HideDate       = 0x8000,
 			NoxDeleted     = 0x10000,
+			NoxBurnt       = 0x20000,
 			//Unread, // We don't want to pass and update it in Date for now.
 		};
 		friend inline constexpr bool is_flag_type(Flag) { return true; };

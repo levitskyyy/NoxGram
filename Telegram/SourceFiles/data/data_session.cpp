@@ -3099,7 +3099,9 @@ void Session::updateEditedMessage(const MTPMessage &data) {
 		Reactions::CheckUnknownForUnread(this, data);
 		return;
 	}
-	if (data.type() == mtpc_message) {
+	if (Nox::Spy::IgnoresExpiredEdit(existing, data)) {
+		return;
+	} else if (data.type() == mtpc_message) {
 		// NoxGram spy mode: remember the text before it is replaced.
 		Nox::Spy::RememberEdit(existing, qs(data.c_message().vmessage()));
 	}

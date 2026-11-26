@@ -45,6 +45,12 @@ void NoteActivity(not_null<Main::Session*> session);
 // so the reply does not look odd next to unread messages.
 void MarkReadAfterAction(not_null<History*> history);
 
+// Reads the chat up to the item on the server even in ghost mode.
+void ReadUntil(not_null<HistoryItem*> item);
+
+// Tells the server the media of the item was opened, even in ghost mode.
+void ReadContents(not_null<HistoryItem*> item);
+
 // Sends a message as scheduled a few seconds ahead, so sending it does not
 // make the account appear online.
 void ApplyScheduling(

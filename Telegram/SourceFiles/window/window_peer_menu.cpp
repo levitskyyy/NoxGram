@@ -151,7 +151,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include <QAction>
 #include <QtWidgets/QApplication>
-#include "noxgram/spy.h"
+#include "noxgram/menu.h"
 
 namespace Window {
 namespace {
@@ -2019,7 +2019,7 @@ void Filler::fillHistoryActions() {
 	addTranslate();
 	Nagram::AutoTranslate::AddPeerMenu(_addAction, _controller, _peer);
 	Nagram::SendTranslation::AddPeerMenu(_addAction, _controller, _peer);
-	Nox::Spy::AddPeerMenu(_addAction, _controller, _peer);
+	Nox::Menu::AddPeerActions(_addAction, _controller, _peer);
 	Nagram::Filters::AddScopeAction(_addAction, _controller, _peer, nullptr);
 	addReport();
 	addClearHistory();
