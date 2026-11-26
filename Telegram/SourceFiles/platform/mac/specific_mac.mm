@@ -34,6 +34,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <sys/mount.h>
 #include <sys/sysctl.h>
 #include <sys/xattr.h>
+#include <unistd.h>
 
 #include <Cocoa/Cocoa.h>
 #include <CoreFoundation/CFURL.h>
@@ -247,8 +248,8 @@ void ShowTranslocationError() {
 
 	NSAlert *alert = [[NSAlert alloc] init];
 	alert.alertStyle = NSAlertStyleCritical;
-	alert.messageText = @"NoxGram Desktop can't start from here";
-	alert.informativeText = @"macOS started this copy of NoxGram Desktop "
+	alert.messageText = @"Nagram Desktop can't start from here";
+	alert.informativeText = @"macOS started this copy of Nagram Desktop "
 		@"from a read-only temporary location (App Translocation), so it "
 		@"can't use its own folder. Please reinstall the app and launch it "
 		@"again.";
@@ -272,14 +273,14 @@ void finish() {
 }
 
 // macOS starts a quarantined bundle that was never moved by Finder from
-// a random read-only mount. NoxGram is shipped unsigned as a zip, so this
-// is how almost every first launch looks. When the original location is
-// known, stripping the quarantine attribute there is exactly what a Finder
-// move would have done (Gatekeeper has already assessed and allowed this
-// launch), and the original can be relaunched in place. If that fails, a
-// regular build still works from the translocated copy, its data lives in
-// Application Support; only a portable build, which would lose its
-// NoxGramForcePortable folder and silently use the default data, stops.
+// a random read-only mount, so a portable build loses the
+// NagramForcePortable folder it was shipped with and silently works on
+// the default installation's data. When the original location is known
+// and is the shipped portable layout, stripping the quarantine attribute
+// there is exactly what a Finder move would have done (Gatekeeper has
+// already assessed and allowed this launch), and the original can be
+// relaunched in place. Anything else is a hard stop: moving the parent
+// folder does not help and the user has to reinstall.
 bool CheckAppTranslocation() {
 #ifdef OS_MAC_STORE
 	// Installed by the App Store: never quarantined, never translocated,
@@ -306,97 +307,17 @@ bool CheckAppTranslocation() {
 	const auto portable = !state.original.isEmpty()
 		&& QFileInfo(state.original + u"/Contents/Info.plist"_q).isFile()
 		&& QDir(QFileInfo(state.original).path()
-			+ u"/NoxGramForcePortable"_q).exists();
-	const auto bundled = !state.original.isEmpty()
-		&& QFileInfo(state.original + u"/Contents/Info.plist"_q).isFile();
+			+ u"/NagramForcePortable"_q).exists();
 	if (!relaunched
-		&& bundled
+		&& portable
 		&& RemoveQuarantineRecursively(state.original)
 		&& RelaunchUntranslocated(state.original)) {
 		LOG(("Translocation Info: relaunched from '%1'."
 			).arg(state.original));
 		return false;
 	}
-	if (!portable) {
-		LOG(("Translocation Info: running translocated."));
-		return true;
-	}
 	ShowTranslocationError();
 	return false;
-
-	}
-#endif // !OS_MAC_STORE
-}
-
-bool RenameLegacyBundle() {
-#ifdef OS_MAC_STORE
-	return true;
-#else // OS_MAC_STORE
-	@autoreleasepool {
-
-	const auto name = cExeName();
-	if (name != u"NoxGram.app"_q) {
-		return true;
-	}
-	NSString *executable = [[NSBundle mainBundle]
-		objectForInfoDictionaryKey:@"CFBundleExecutable"];
-	if (![executable isKindOfClass:[NSString class]]) {
-		return true;
-	}
-	const auto renamed = NS2QString(executable) + u".app"_q;
-	if (renamed == name) {
-		return true;
-	}
-	const auto from = cExeDir() + name;
-	const auto to = cExeDir() + renamed;
-	if (QFileInfo::exists(to)) {
-		LOG(("Bundle Rename Info: '%1' exists, keeping '%2'."
-			).arg(to
-			).arg(from));
-		return true;
-	}
-	NSFileManager *manager = [NSFileManager defaultManager];
-	NSError *error = nil;
-	if (![manager moveItemAtPath:Q2NSString(from)
-			toPath:Q2NSString(to)
-			error:&error]) {
-		LOG(("Bundle Rename Error: could not move '%1' to '%2': %3"
-			).arg(from
-			).arg(to
-			).arg(NS2QString([error localizedDescription])));
-		return true;
-	}
-
-	NSMutableArray *arguments = [NSMutableArray array];
-	const auto &all = Core::Launcher::Instance().arguments();
-	for (auto i = 1; i < all.size(); ++i) {
-		if (!all[i].startsWith(u"-psn_"_q)) {
-			[arguments addObject:Q2NSString(all[i])];
-		}
-	}
-	const auto launched = [[NSWorkspace sharedWorkspace]
-		launchApplicationAtURL:[NSURL fileURLWithPath:Q2NSString(to)]
-		options:NSWorkspaceLaunchAsync | NSWorkspaceLaunchNewInstance
-		configuration:@{ NSWorkspaceLaunchConfigurationArguments: arguments }
-		error:&error];
-	if (launched) {
-		LOG(("Bundle Rename Info: moved '%1' to '%2' and relaunched."
-			).arg(from
-			).arg(to));
-		return false;
-	}
-	LOG(("Bundle Rename Error: relaunch from '%1' failed: %2"
-		).arg(to
-		).arg(NS2QString([error localizedDescription])));
-	error = nil;
-	if (![manager moveItemAtPath:Q2NSString(to)
-			toPath:Q2NSString(from)
-			error:&error]) {
-		LOG(("Bundle Rename Error: could not move '%1' back: %2"
-			).arg(to
-			).arg(NS2QString([error localizedDescription])));
-	}
-	return true;
 
 	}
 #endif // !OS_MAC_STORE
@@ -408,6 +329,14 @@ QString SingleInstanceLocalServerName(const QString &hash) {
 #else // OS_MAC_STORE
 	return objc_documentsPath() + hash.left(4);
 #endif // OS_MAC_STORE
+}
+
+bool LocalSocketPeerAllowed(qintptr descriptor) {
+	auto uid = uid_t();
+	auto gid = gid_t();
+	return (descriptor >= 0)
+		&& !getpeereid(int(descriptor), &uid, &gid)
+		&& (uid == geteuid());
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)

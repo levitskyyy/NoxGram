@@ -272,6 +272,7 @@ void EnumerateWebPagePhotos(
 	case WebPageType::Story:
 	case WebPageType::StoryAlbum:
 	case WebPageType::NewBot:
+	case WebPageType::BotInvite:
 	case WebPageType::VoiceChat:
 	case WebPageType::Livestream:
 	case WebPageType::ConferenceCall: return true;
@@ -370,6 +371,32 @@ Session::Session(not_null<Main::Session*> session)
 	setupChannelLeavingViewer();
 	setupPeerNameViewer();
 	setupUserIsContactViewer();
+
+	session->changes().peerUpdates(
+		PeerUpdate::Flag::VerifyInfo
+	) | rpl::on_next([=](const PeerUpdate &update) {
+		auto affected = std::vector<base::weak_ptr<ViewElement>>();
+		for (const auto &[item, views] : _views) {
+			for (const auto &view : views) {
+				if (view->displayFrom() == update.peer
+					&& view->displayFromName()
+					&& view->hasBubble()) {
+					view->setPendingResize();
+					affected.push_back(base::make_weak(view.get()));
+				}
+			}
+		}
+		for (const auto &weak : affected) {
+			if (const auto view = weak.get()) {
+				requestViewRepaint(view);
+				if (view->pendingResize()) {
+					requestViewResize(view);
+				} else {
+					notifyViewLayoutChange(view);
+				}
+			}
+		}
+	}, _lifetime);
 
 	_chatsList.unreadStateChanges(
 	) | rpl::on_next([=] {
@@ -653,7 +680,7 @@ not_null<UserData*> Session::processUser(const MTPUser &data) {
 		return data.vid().v;
 	}));
 	auto minimal = false;
-	const MTPUserStatus *status = nullptr;
+	auto status = (const MTPUserStatus*)nullptr;
 	const MTPUserStatus emptyStatus = MTP_userStatusEmpty();
 
 	using UpdateFlag = PeerUpdate::Flag;
@@ -736,6 +763,7 @@ not_null<UserData*> Session::processUser(const MTPUser &data) {
 				| Flag::MutualContact
 				| Flag::DiscardMinPhoto
 				| Flag::StoriesHidden
+				| Flag::CloseFriend
 				: Flag());
 		const auto storiesState = minimal
 			? std::optional<Data::Stories::PeerSourceState>()
@@ -778,6 +806,7 @@ not_null<UserData*> Session::processUser(const MTPUser &data) {
 					? Flag()
 					: Flag::DiscardMinPhoto)
 				| (data.is_stories_hidden() ? Flag::StoriesHidden : Flag())
+				| (data.is_close_friend() ? Flag::CloseFriend : Flag())
 				: Flag());
 		result->setFlags((result->flags() & ~flagsMask) | flagsSet);
 		result->setBotVerifyDetailsIcon(
@@ -2147,7 +2176,7 @@ bool Session::queryDocumentVisibility(
 }
 
 
-[[nodiscard]] auto Session::itemVisibilityQueries() const
+auto Session::itemVisibilityQueries() const
 -> rpl::producer<Session::ItemVisibilityQuery> {
 	return _itemVisibilityQueries.events();
 }

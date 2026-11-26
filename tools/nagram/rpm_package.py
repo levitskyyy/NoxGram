@@ -2,9 +2,10 @@
 """Build the RPM package nagram-desktop from the Linux release directory.
 
 The package installs the directory that linux_tree.py lays out, the same way
-as the AUR package: the binary to /usr/bin/Nagram, Nagram/share to
-/usr/share, and a marker that switches the built-in updater off, since the
-package manager updates the package. It is a binary package, for Fedora,
+as the AUR package: the binary to /usr/bin/Nagram, its widget helper to
+/usr/bin/TelegramDesktop, Nagram/share to /usr/share, and a marker that
+switches the built-in updater off, since the package manager updates the
+package. It is a binary package, for Fedora,
 RHEL and openSUSE alike: the libraries are required by their sonames, which
 every distribution resolves to its own package names.
 
@@ -101,6 +102,9 @@ def spec(version, files):
         "",
         "%install",
         'install -Dm755 "%{nagram_tree}/Nagram" "%{buildroot}/usr/bin/Nagram"',
+        "# The binary starts the widget helper from TelegramDesktop/ beside it.",
+        'install -Dm755 "%{nagram_tree}/TelegramDesktop/TelegramWidgetHelper"'
+        ' "%{buildroot}/usr/bin/TelegramDesktop/TelegramWidgetHelper"',
         'install -d "%{buildroot}/usr/share"',
         'cp -r --no-preserve=ownership "%{nagram_tree}/share/." "%{buildroot}/usr/share/"',
         "# The package manager updates this copy, so the built-in updater is switched off.",
@@ -109,6 +113,8 @@ def spec(version, files):
         "",
         "%files",
         "/usr/bin/Nagram",
+        "%dir /usr/bin/TelegramDesktop",
+        "/usr/bin/TelegramDesktop/TelegramWidgetHelper",
         "%dir /usr/share/NagramDesktop",
         f"%dir {Path(MARKER).parent}",
         MARKER,
@@ -121,6 +127,8 @@ def spec(version, files):
 def build(app, version, out):
     if not (app / "Nagram").is_file():
         raise RpmError(f"{app / 'Nagram'} is not a file")
+    if not (app / "TelegramDesktop" / "TelegramWidgetHelper").is_file():
+        raise RpmError(f"{app / 'TelegramDesktop' / 'TelegramWidgetHelper'} is not a file")
     text = spec(version, installed_files(app))
     with tempfile.TemporaryDirectory() as work:
         work = Path(work)

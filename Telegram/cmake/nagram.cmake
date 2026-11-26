@@ -14,6 +14,7 @@ set(nagram_sources
     nagram/core/options.cpp
     nagram/core/regex.cpp
     nagram/core/diagnostics.cpp
+    nagram/core/bundle_rename_mac.mm
     nagram/core/relaunch.cpp
     nagram/core/updates.cpp
     nagram/core/updates_model.cpp
@@ -73,6 +74,8 @@ set(nagram_sources
     nagram/media/cover.cpp
     nagram/media/sticker_export.cpp
     nagram/media/sticker_export_model.cpp
+    nagram/media/sticker_gif.cpp
+    nagram/media/sticker_gif_model.cpp
     nagram/media/url_template.cpp
     nagram/media/extras.cpp
     nagram/media/viewer_window.cpp
@@ -229,6 +232,10 @@ endif()
 nice_target_sources(Telegram ${res_loc} PRIVATE qrc/nagram.qrc)
 if (APPLE)
     nice_target_sources(Telegram ${res_loc} PRIVATE qrc/nagram_mac.qrc)
+    # Nagram.app on macOS is the native app (Nagram-macOS).
+    set(nagram_output_name "NoxGram Desktop")
+else()
+    set(nagram_output_name "NoxGram")
 endif()
 
 # Compiles the Icon Composer document so macOS renders the app icon itself.
@@ -342,6 +349,7 @@ if (DESKTOP_APP_TEST_APPS)
         nagram/notifications/model.cpp
         nagram/media/url_template.cpp
         nagram/media/sticker_export_model.cpp
+        nagram/media/sticker_gif_model.cpp
         nagram/snapshot/cloud_theme_model.cpp
         nagram/sync/model.cpp
     )

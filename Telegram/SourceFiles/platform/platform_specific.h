@@ -31,9 +31,6 @@ inline constexpr auto kUntranslocatedArgument = "-untranslocated";
 // build, told the user.
 [[nodiscard]] bool CheckAppTranslocation();
 
-// NAGRAM: false when the bundle was renamed to its current name and relaunched.
-[[nodiscard]] bool RenameLegacyBundle();
-
 enum class PermissionStatus {
 	Granted,
 	CanRequest,
@@ -94,8 +91,8 @@ void finish();
 
 #ifdef Q_OS_WIN
 #include "platform/win/specific_win.h"
-#elif defined Q_OS_MAC // Q_OS_WIN
+#elif defined Q_OS_MACOS // Q_OS_WIN
 #include "platform/mac/specific_mac.h"
-#else // Q_OS_WIN || Q_OS_MAC
+#else // Q_OS_WIN || Q_OS_MACOS
 #include "platform/linux/specific_linux.h"
-#endif // else for Q_OS_WIN || Q_OS_MAC
+#endif // else for Q_OS_WIN || Q_OS_MACOS

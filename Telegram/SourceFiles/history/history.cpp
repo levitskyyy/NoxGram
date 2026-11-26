@@ -19,6 +19,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item_components.h"
 #include "history/history_item_helpers.h"
 #include "history/history_streamed_drafts.h"
+#include "history/history_top_message_hint.h"
 #include "history/history_translation.h"
 #include "history/history_unread_things.h"
 #include "iv/editor/iv_editor_session.h"
@@ -218,6 +219,9 @@ void History::setHasPendingResizedItems() {
 }
 
 void History::itemRemoved(not_null<HistoryItem*> item) {
+	if (const auto hint = _topMessageHint.get()) {
+		hint->itemRemoved(item);
+	}
 	if (item == _joinedMessage) {
 		_joinedMessage = nullptr;
 	} else if (item == _newPeerNameChange) {
@@ -1997,8 +2001,8 @@ void History::checkLastMessage() {
 
 void History::addItemsToLists(
 		const std::vector<not_null<HistoryItem*>> &items) {
-	std::deque<not_null<UserData*>> *lastAuthors = nullptr;
-	base::flat_set<not_null<PeerData*>> *markupSenders = nullptr;
+	auto lastAuthors = (std::deque<not_null<UserData*>>*)nullptr;
+	auto markupSenders = (base::flat_set<not_null<PeerData*>>*)nullptr;
 	if (peer->isChat()) {
 		lastAuthors = &peer->asChat()->lastAuthors;
 		markupSenders = &peer->asChat()->markupSenders;
@@ -2441,7 +2445,7 @@ void History::setFakeUnreadWhileOpened(bool enabled) {
 	owner().chatsFilters().refreshHistory(this);
 }
 
-[[nodiscard]] bool History::fakeUnreadWhileOpened() const {
+bool History::fakeUnreadWhileOpened() const {
 	return (_flags & Flag::FakeUnreadWhileOpened);
 }
 
@@ -2668,7 +2672,7 @@ void History::applyPinnedUpdate(const MTPDupdateDialogPinned &data) {
 }
 
 TimeId History::adjustedChatListTimeId() const {
-	const auto result = chatListTimeId();
+	const auto result = std::max(chatListTimeId(), topMessageHintDate());
 	if (const auto channel = peer->asChannel()) {
 		if (channel->isCommunity()) {
 			if (const auto info = channel->communityInfo()) {
@@ -3157,6 +3161,9 @@ void History::setLastServerMessage(HistoryItem *item) {
 
 void History::setLastMessage(HistoryItem *item) {
 	if (_lastMessage && *_lastMessage == item) {
+		if (const auto hint = _topMessageHint.get()) {
+			hint->lastMessageSet(item, false);
+		}
 		return;
 	}
 	_lastMessage = item;
@@ -3173,6 +3180,9 @@ void History::setLastMessage(HistoryItem *item) {
 		if (!chatListMessageKnown()) {
 			setFakeChatListMessage();
 		}
+	}
+	if (const auto hint = _topMessageHint.get()) {
+		hint->lastMessageSet(item, true);
 	}
 }
 
@@ -3489,8 +3499,13 @@ bool History::shouldBeInChatList() const {
 			return true;
 		}
 	}
+	const auto last = lastMessage();
 	return !lastMessageKnown()
-		|| (lastMessage() != nullptr);
+		|| (last != nullptr && !isNewPeerMessage(last));
+}
+
+bool History::isNewPeerMessage(not_null<HistoryItem*> item) const {
+	return (item == _newPeerPhotoChange) || (item == _newPeerNameChange);
 }
 
 void History::unknownMessageDeleted(MsgId messageId) {
@@ -3498,6 +3513,9 @@ void History::unknownMessageDeleted(MsgId messageId) {
 		.arg(peer->id.value & PeerId::kChatTypeMask)
 		.arg(messageId.bare));
 	_unknownDeletedMessages[messageId] = base::unixtime::now();
+	if (const auto hint = _topMessageHint.get()) {
+		hint->unknownMessageDeleted(messageId);
+	}
 	if (_inboxReadBefore && messageId >= *_inboxReadBefore) {
 		owner().histories().requestDialogEntry(this);
 	}
@@ -4224,6 +4242,7 @@ void History::checkNewPeerMessages() {
 	if (name && !_newPeerNameChange) {
 		_newPeerNameChange = add(tr::lng_new_contact_updated_name, name);
 	}
+	updateChatListExistence();
 }
 
 void History::insertMessageToBlocks(not_null<HistoryItem*> item) {
@@ -4497,6 +4516,7 @@ void History::clear(ClearType type, bool markEmpty) {
 			messages->removeAll();
 		}
 		clearLastKeyboard();
+		clearTopMessageHint();
 	}
 
 	if (const auto chat = peer->asChat()) {
@@ -4512,6 +4532,9 @@ void History::clear(ClearType type, bool markEmpty) {
 
 void History::clearUpTill(MsgId availableMinId) {
 	Tgw::ClearHistoryStorage(this, availableMinId);
+	if (const auto hint = _topMessageHint.get()) {
+		hint->clearedUpTill(availableMinId);
+	}
 	auto remove = std::vector<not_null<HistoryItem*>>();
 	remove.reserve(_items.size());
 	for (const auto &item : _items) {
