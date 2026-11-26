@@ -33,6 +33,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/themes/window_theme_editor.h"
 #include "ui/boxes/confirm_box.h"
 #include "data/components/promo_suggestions.h"
+#include "data/data_stories.h"
 #include "data/data_story.h"
 #include "data/data_thread.h"
 #include "noxgram/ghost.h"
@@ -653,8 +654,14 @@ void Controller::openInMediaView(Media::View::OpenRequest &&request) {
 		const auto shared = std::make_shared<Media::View::OpenRequest>(
 			std::move(request));
 		const auto weak = base::make_weak(this);
+		const auto session = base::make_weak(&story->owner().session());
+		const auto storyId = story->fullId();
 		const auto open = [=] {
-			if (const auto strong = weak.get()) {
+			const auto strong = weak.get();
+			const auto alive = session.get();
+			if (strong
+				&& alive
+				&& alive->data().stories().lookup(storyId)) {
 				strong->_openInMediaViewRequests.fire_copy(*shared);
 			}
 		};

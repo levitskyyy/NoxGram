@@ -102,7 +102,7 @@ public:
 		if (_db || _failed) {
 			return _db;
 		}
-		const auto path = QFile::encodeName(_path);
+		const auto path = _path.toUtf8();
 		const auto flags = SQLITE_OPEN_READWRITE
 			| SQLITE_OPEN_CREATE
 			| SQLITE_OPEN_FULLMUTEX;
@@ -302,7 +302,7 @@ VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
 }
 
 void ImportLegacy(sqlite3 *db, const QString &folder) {
-	const auto import = [&](const QString &name, auto insert) {
+	const auto importFile = [&](const QString &name, auto insert) {
 		const auto path = folder + '/' + name;
 		auto file = QFile(path);
 		if (!file.open(QIODevice::ReadOnly)) {
@@ -321,8 +321,8 @@ void ImportLegacy(sqlite3 *db, const QString &folder) {
 		file.close();
 		QFile::remove(path);
 	};
-	import(u"deleted.jsonl"_q, InsertDeleted);
-	import(u"edits.jsonl"_q, InsertEdit);
+	importFile(u"deleted.jsonl"_q, InsertDeleted);
+	importFile(u"edits.jsonl"_q, InsertEdit);
 }
 
 [[nodiscard]] Record ReadDeleted(const Statement &row) {

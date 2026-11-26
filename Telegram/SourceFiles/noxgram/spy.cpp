@@ -300,8 +300,11 @@ void DeletedBox(
 			state->before = record.rowId;
 		}
 		if (state->more && int(page.size()) < kPage) {
-			delete state->more;
-			state->more = nullptr;
+			const auto more = base::take(state->more);
+			more->hide();
+			crl::on_main(more, [=] {
+				delete more;
+			});
 		}
 		return int(page.size());
 	};

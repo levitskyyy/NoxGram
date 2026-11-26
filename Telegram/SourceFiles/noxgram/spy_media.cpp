@@ -24,6 +24,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QMimeDatabase>
+#include <QtCore/QRegularExpression>
 
 namespace Nox::Spy {
 namespace {
@@ -59,7 +60,8 @@ struct Pending {
 	if (!document) {
 		return QString();
 	}
-	const auto suffix = QFileInfo(document->filename()).suffix();
+	auto suffix = QFileInfo(document->filename()).suffix();
+	suffix.remove(QRegularExpression(u"[^A-Za-z0-9]"_q));
 	if (!suffix.isEmpty()) {
 		return suffix.left(16);
 	}
@@ -122,7 +124,9 @@ private:
 		const auto done = [] {
 			return true;
 		};
-		if (QFileInfo::exists(pending.target)
+		if (pending.document && pending.document->loading()) {
+			return false;
+		} else if (QFileInfo::exists(pending.target)
 			&& QFileInfo(pending.target).size() > 0) {
 			return done();
 		}
@@ -302,7 +306,7 @@ QString MediaExtension(not_null<HistoryItem*> item) {
 }
 
 void SaveMedia(not_null<HistoryItem*> item) {
-	const auto &options = Nagram::ForDevice();
+	auto &options = Nagram::ForDevice();
 	if (!options.Get(kSaveDeletedMedia)) {
 		return;
 	}

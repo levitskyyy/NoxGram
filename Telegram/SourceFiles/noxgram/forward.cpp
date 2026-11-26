@@ -97,8 +97,10 @@ public:
 		QDir().mkpath(Folder());
 		const auto self = shared_from_this();
 		_session->data().itemIdChanged(
-		) | rpl::on_next([=](const Data::Session::IdChange &) {
-			if (_waitingSent > 0 && !--_waitingSent) {
+		) | rpl::on_next([=](const Data::Session::IdChange &change) {
+			if (change.newId.peer != _action.history->peer->id) {
+				return;
+			} else if (_waitingSent > 0 && !--_waitingSent) {
 				self->waited();
 			}
 		}, _lifetime);
