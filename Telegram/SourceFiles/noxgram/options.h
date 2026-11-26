@@ -65,6 +65,13 @@ inline constexpr auto kSaveForBots = Option<bool>{
 inline constexpr auto kKeepSelfDestructing = Option<bool>{
 	"nagram.nox.keepSelfDestructing", Scope::Device, true,
 	Category::Privacy, "lng_nox_keep_self_destructing" };
+inline constexpr auto kSaveDeletedMedia = Option<bool>{
+	"nagram.nox.saveDeletedMedia", Scope::Device, true,
+	Category::Privacy, "lng_nox_save_deleted_media" };
+inline constexpr auto kDeletedMediaLimit = Option<int>{
+	"nagram.nox.deletedMediaLimit", Scope::Device, 2,
+	Category::Privacy, "lng_nox_deleted_media_limit", 0u,
+	[](const int &value) { return value >= 0 && value <= 4; } };
 
 // Connection: MTProto inside a WebSocket to web.telegram.org.
 inline constexpr auto kWsTransport = Option<bool>{
@@ -88,6 +95,8 @@ inline void RegisterOptions(Nagram::Registry &registry) {
 	Expects(registry.Add(kSaveEdits));
 	Expects(registry.Add(kSaveForBots));
 	Expects(registry.Add(kKeepSelfDestructing));
+	Expects(registry.Add(kSaveDeletedMedia));
+	Expects(registry.Add(kDeletedMediaLimit));
 	Expects(registry.Add(kWsTransport));
 	Expects(registry.Add(kWsDirectFallback));
 }

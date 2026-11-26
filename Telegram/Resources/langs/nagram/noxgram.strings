@@ -23,7 +23,7 @@ NoxGram strings. Ghost mode and spy mode are modelled on AyuGram Desktop
 "lng_nox_save_edits" = "Keep edit history";
 "lng_nox_keep_self_destructing" = "Keep self-destructing messages";
 "lng_nox_save_for_bots" = "Also in chats with bots";
-"lng_nox_spy_about" = "Messages deleted by others stay in the chat with a “deleted” mark until restart. Their text and the previous versions of edited messages are saved on this device only, in the tdata folder, and can be opened from the chat menu and the message menu.";
+"lng_nox_spy_about" = "Messages deleted by others stay in the chat with a “deleted” mark until restart. Their text, photos and files and the previous versions of edited messages are saved on this device only, in a database in the tdata folder, and open from the chat menu and the message menu.";
 "lng_nox_deleted_mark" = "deleted";
 "lng_nox_spy_edit_history" = "Edit history";
 "lng_nox_spy_current_version" = "Current version";
@@ -38,3 +38,18 @@ NoxGram strings. Ghost mode and spy mode are modelled on AyuGram Desktop
 "lng_nox_ws_transport_about" = "MTProto traffic goes inside a secure WebSocket (TLS) to Telegram's own web servers, the way Telegram Web connects. To the network it looks like ordinary HTTPS, which helps where direct connections to Telegram are blocked or slowed down. Messages stay encrypted by MTProto as usual. Doesn't apply while a proxy is on.";
 "lng_nox_ws_direct_fallback" = "Fall back to a direct connection";
 "lng_nox_ws_direct_fallback_about" = "If web.telegram.org can't be reached, connect to Telegram directly. Turn off to never connect directly.";
+"lng_nox_save_deleted_media" = "Save photos, videos and files";
+"lng_nox_deleted_media_limit" = "Largest file to save";
+"lng_nox_deleted_media_unlimited" = "No limit";
+"lng_nox_spy_storage" = "Saved data";
+"lng_nox_spy_storage_counting" = "Counting…";
+"lng_nox_spy_storage_value" = "{deleted} deleted, {edits} edits, {size}";
+"lng_nox_spy_clear_all" = "Clear saved messages";
+"lng_nox_spy_clear_all_sure" = "Delete all saved deleted messages, edit history and media of this account from this device?";
+"lng_nox_spy_open_folder" = "Open the folder";
+"lng_nox_spy_cleared" = "Saved messages cleared.";
+"lng_nox_spy_media_not_saved" = "not saved";
+"lng_nox_spy_media_open" = "Open: {media}";
+"lng_nox_spy_media_show" = "Show in folder";
+"lng_nox_spy_expired_at" = "self-destructed {date}";
+"lng_nox_spy_load_more" = "Show earlier";

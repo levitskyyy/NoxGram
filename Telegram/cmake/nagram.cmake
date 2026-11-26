@@ -162,12 +162,36 @@ set(nagram_sources
     noxgram/ghost_spy_settings.cpp
     noxgram/lang.cpp
     noxgram/spy.cpp
+    noxgram/spy_db.cpp
+    noxgram/spy_media.cpp
     noxgram/ws_transport.cpp
 )
 
 if (nagram_sources)
     nice_target_sources(Telegram ${src_loc} PRIVATE ${nagram_sources})
 endif()
+
+# NoxGram spy mode keeps its records in an SQLite database on disk.
+add_library(noxgram_sqlite STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/sqlite/sqlite3.c
+)
+target_include_directories(noxgram_sqlite PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/sqlite
+)
+target_compile_definitions(noxgram_sqlite PRIVATE
+    SQLITE_THREADSAFE=1
+    SQLITE_DEFAULT_WAL_SYNCHRONOUS=1
+    SQLITE_OMIT_LOAD_EXTENSION
+    SQLITE_OMIT_DEPRECATED
+    SQLITE_DQS=0
+)
+if (MSVC)
+    target_compile_options(noxgram_sqlite PRIVATE /W0)
+else()
+    target_compile_options(noxgram_sqlite PRIVATE -w)
+endif()
+set_target_properties(noxgram_sqlite PROPERTIES FOLDER "NoxGram")
+target_link_libraries(Telegram PRIVATE noxgram_sqlite)
 
 include(${CMAKE_CURRENT_LIST_DIR}/nagram_version.cmake)
 

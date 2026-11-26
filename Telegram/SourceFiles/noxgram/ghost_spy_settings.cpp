@@ -12,6 +12,16 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "noxgram/ghost.h"
 #include "noxgram/options.h"
 #include "noxgram/lang.h"
+#include "noxgram/spy_db.h"
+#include "noxgram/spy_media.h"
+#include "core/file_utilities.h"
+#include "main/main_session.h"
+#include "ui/boxes/confirm_box.h"
+#include "ui/layers/generic_box.h"
+#include "ui/text/format_values.h"
+#include "ui/toast/toast.h"
+#include "ui/widgets/checkbox.h"
+#include "styles/style_layers.h"
 #include "nagram/settings/home.h"
 #include "lang/lang_keys.h"
 #include "settings/settings_builder.h"
@@ -22,6 +32,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/window_session_controller.h"
 #include "styles/style_menu_icons.h"
 #include "styles/style_settings.h"
+
+#include <QtCore/QDir>
 
 namespace Nox {
 namespace {
@@ -73,6 +85,116 @@ void AddToggle(
 			}
 		}, button->lifetime());
 	}
+}
+
+[[nodiscard]] QString MediaLimitText(int index) {
+	return (index >= 4)
+		? Nox::TrNow(u"lng_nox_deleted_media_unlimited"_q)
+		: Ui::FormatSizeText(Spy::MediaLimitBytes(index));
+}
+
+void MediaLimitBox(not_null<Ui::GenericBox*> box) {
+	box->setTitle(Nox::Tr(u"lng_nox_deleted_media_limit"_q));
+	const auto group = std::make_shared<Ui::RadiobuttonGroup>(
+		Nagram::ForDevice().Get(kDeletedMediaLimit));
+	for (auto value = 0; value != 5; ++value) {
+		box->addRow(object_ptr<Ui::Radiobutton>(
+			box,
+			group,
+			value,
+			MediaLimitText(value),
+			st::settingsSendType), st::settingsSendTypePadding);
+	}
+	group->setChangedCallback([=](int value) {
+		Expects(Nagram::ForDevice().Set(kDeletedMediaLimit, value));
+		box->closeBox();
+	});
+	box->addButton(tr::lng_cancel(), [=] { box->closeBox(); });
+}
+
+void AddMediaLimit(SectionBuilder &builder) {
+	const auto controller = builder.controller();
+	builder.addButton({
+		.id = u"noxgram/spy/media-limit"_q,
+		.title = Nox::Tr(u"lng_nox_deleted_media_limit"_q),
+		.st = &st::settingsButtonNoIcon,
+		.label = Nagram::ForDevice().Value(
+			kDeletedMediaLimit
+		) | rpl::map(MediaLimitText),
+		.onClick = [=] {
+			if (controller) {
+				controller->show(Box(MediaLimitBox));
+			}
+		},
+		.keywords = { u"size"_q, u"limit"_q, u"media"_q },
+		.shown = Nagram::ForDevice().Value(kSaveDeletedMedia),
+	});
+}
+
+void AddStorage(SectionBuilder &builder) {
+	const auto controller = builder.controller();
+	const auto usage = std::make_shared<rpl::variable<QString>>(
+		Nox::TrNow(u"lng_nox_spy_storage_counting"_q));
+	const auto refresh = [=] {
+		if (!controller) {
+			return;
+		}
+		Spy::DatabaseFor(&controller->session()).usage([=](Spy::Usage u) {
+			*usage = Nox::TrNow(u"lng_nox_spy_storage_value"_q, {
+				{ u"deleted"_q, QString::number(u.deleted) },
+				{ u"edits"_q, QString::number(u.edits) },
+				{ u"size"_q, Ui::FormatSizeText(u.bytes) },
+			});
+		});
+	};
+	builder.addSubsectionTitle(Nox::Tr(u"lng_nox_spy_storage"_q));
+	const auto info = builder.addButton({
+		.id = u"noxgram/spy/storage"_q,
+		.title = usage->value(),
+		.st = &st::settingsButtonNoIcon,
+		.onClick = refresh,
+		.keywords = { u"storage"_q, u"size"_q, u"deleted"_q },
+	});
+	if (info) {
+		refresh();
+	}
+	builder.addButton({
+		.id = u"noxgram/spy/open-folder"_q,
+		.title = Nox::Tr(u"lng_nox_spy_open_folder"_q),
+		.st = &st::settingsButtonNoIcon,
+		.onClick = [=] {
+			if (controller) {
+				const auto &database = Spy::DatabaseFor(
+					&controller->session());
+				QDir().mkpath(database.folder());
+				File::ShowInFolder(database.folder() + u"/spy.sqlite"_q);
+			}
+		},
+		.keywords = { u"folder"_q, u"files"_q, u"deleted"_q },
+	});
+	builder.addButton({
+		.id = u"noxgram/spy/clear-all"_q,
+		.title = Nox::Tr(u"lng_nox_spy_clear_all"_q),
+		.st = &st::settingsAttentionButton,
+		.onClick = [=] {
+			if (!controller) {
+				return;
+			}
+			controller->show(Ui::MakeConfirmBox({
+				.text = Nox::TrNow(u"lng_nox_spy_clear_all_sure"_q),
+				.confirmed = [=](Fn<void()> close) {
+					Spy::DatabaseFor(&controller->session()).clearAll();
+					close();
+					controller->showToast(
+						Nox::TrNow(u"lng_nox_spy_cleared"_q));
+					refresh();
+				},
+				.confirmText = tr::lng_box_delete(),
+				.confirmStyle = &st::attentionBoxButton,
+			}));
+		},
+		.keywords = { u"clear"_q, u"delete"_q, u"deleted"_q, u"storage"_q },
+	});
 }
 
 const auto kMeta = BuildHelper({
@@ -142,7 +264,13 @@ const auto kMeta = BuildHelper({
 		Nox::Tr(u"lng_nox_save_for_bots"_q),
 		u"noxgram/spy/save-for-bots"_q,
 		{ u"bots"_q, u"spy"_q });
+	AddToggle(builder, kSaveDeletedMedia,
+		Nox::Tr(u"lng_nox_save_deleted_media"_q),
+		u"noxgram/spy/save-media"_q,
+		{ u"photo"_q, u"video"_q, u"media"_q, u"spy"_q });
+	AddMediaLimit(builder);
 	builder.addDividerText(Nox::Tr(u"lng_nox_spy_about"_q));
+	AddStorage(builder);
 });
 
 const SectionBuildMethod GhostSpySection::kBuild = kMeta.build;
