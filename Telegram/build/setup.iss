@@ -1,9 +1,9 @@
-#define MyAppShortName "Nagram"
-#define MyAppName "Nagram Desktop"
-#define MyAppPublisher "NextAlone and Nagram contributors"
-#define MyAppURL "https://github.com/NextAlone/Nagram-qt"
-#define MyAppExeName "Nagram.exe"
-#define MyAppId "F113D826-7421-5D5F-91E5-E07C9D902EFF"
+#define MyAppShortName "NoxGram"
+#define MyAppName "NoxGram Desktop"
+#define MyAppPublisher "NoxGram contributors"
+#define MyAppURL "https://github.com/levitskyyy/NoxGram"
+#define MyAppExeName "NoxGram.exe"
+#define MyAppId "A162513C-82EF-5E05-9949-5E2471AF05C4"
 #define CurrentYear GetDateTimeString('yyyy','','')
 
 [Setup]
@@ -24,7 +24,7 @@ AllowNoIcons=yes
 OutputDir={#ReleasePath}
 SetupIconFile={#SourcePath}..\Resources\art\icon256.ico
 UninstallDisplayName={#MyAppName}
-UninstallDisplayIcon={app}\Nagram.exe
+UninstallDisplayIcon={app}\NoxGram.exe
 Compression=lzma
 SolidCompression=yes
 DisableStartupPrompt=yes
@@ -79,8 +79,8 @@ Name: "zh_CN";   MessagesFile: "languages\ChineseSimplified.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "{#ReleasePath}\Nagram.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#ReleasePath}\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleasePath}\NoxGram.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleasePath}\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#ReleasePath}\{#ModulesFolder}\TelegramWidgetHelper.exe"; DestDir: "{app}\{#ModulesFolder}"; Flags: ignoreversion
 #if MyBuildTarget != "winarm"
 Source: "{#ReleasePath}\{#ModulesFolder}\d3d\d3dcompiler_47.dll"; DestDir: "{app}\{#ModulesFolder}\d3d"; Flags: ignoreversion skipifsourcedoesntexist

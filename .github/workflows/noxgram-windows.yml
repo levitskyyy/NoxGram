@@ -40,7 +40,6 @@ jobs:
       matrix:
         config: [Release]
         arch: [x64]
-        qt: [qt6]
         generator: [""]
 
     env:
@@ -93,10 +92,10 @@ jobs:
           }
           Get-PSDrive -PSProvider FileSystem | Format-Table Name, Used, Free
 
-      # Release compilation on the x64 runner runs out of memory otherwise
+      # Compilation on the x64 runner runs out of memory otherwise
       # (C1060, compiler is out of heap space).
       - name: Enlarge the page file.
-        if: matrix.arch == 'x64' && env.BUILD_CONFIG == 'Release'
+        if: matrix.arch == 'x64'
         uses: al-cheb/configure-pagefile-action@a3b6ebd6b634da88790d9c58d4b37a7f4a7b8708 # v1.4
         with:
           minimum-size: 16GB
@@ -207,12 +206,12 @@ jobs:
           path: |
             ${{ env.LibrariesPath }}\[qQ]t[_-]*
             ${{ env.LibrariesPath }}\cache_keys\[qQ]t[_-]*
-          key: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-v2-${{ env.CACHE_KEY }}
-          restore-keys: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-v2-
+          key: ${{ runner.OS }}-${{ matrix.arch }}-qt-v2-${{ env.CACHE_KEY }}
+          restore-keys: ${{ runner.OS }}-${{ matrix.arch }}-qt-v2-
 
       - name: Libraries.
         run: |
-          %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat silent ${{ matrix.qt }}
+          %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat silent
 
       # Before the caches are saved, so they hold only what the build needs.
       # tdesktop_rust/out/src/wallet_engine holds the generated
@@ -254,7 +253,7 @@ jobs:
           path: |
             ${{ env.LibrariesPath }}\[qQ]t[_-]*
             ${{ env.LibrariesPath }}\cache_keys\[qQ]t[_-]*
-          key: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-v2-${{ env.CACHE_KEY }}
+          key: ${{ runner.OS }}-${{ matrix.arch }}-qt-v2-${{ env.CACHE_KEY }}
 
       # Old caches would push the libraries out of the repository quota.
       - name: Drop superseded caches.
@@ -265,7 +264,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           THIRD_PARTY_KEY: ${{ runner.OS }}-${{ runner.arch }}-third-party-${{ env.CACHE_KEY }}
           LIBS_KEY: ${{ runner.OS }}-${{ matrix.arch }}-libs-v4-${{ env.CACHE_KEY }}
-          QT_KEY: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-v2-${{ env.CACHE_KEY }}
+          QT_KEY: ${{ runner.OS }}-${{ matrix.arch }}-qt-v2-${{ env.CACHE_KEY }}
         run: |
           bash "$TBUILD/$REPO_NAME/tools/nagram/drop_superseded_caches.sh" \
             "$THIRD_PARTY_KEY" "$LIBS_KEY" "$QT_KEY"
@@ -286,10 +285,6 @@ jobs:
             esac
             echo "Architecture from matrix: $ARCH"
             ARTIFACT_NAME="${ARTIFACT_NAME} ${{ matrix.arch }}"
-          fi
-
-          if [ -n "${{ matrix.qt }}" ]; then
-            ARTIFACT_NAME="${ARTIFACT_NAME} ${{ matrix.qt }}"
           fi
 
           GENERATOR=""
@@ -331,7 +326,6 @@ jobs:
           call configure.bat ^
           %TDESKTOP_BUILD_GENERATOR% ^
           %TDESKTOP_BUILD_ARCH% ^
-          ${{ matrix.qt }} ^
           %TDESKTOP_BUILD_API% ^
           -D CMAKE_CONFIGURATION_TYPES=%BUILD_CONFIG% ^
           -D CMAKE_COMPILE_WARNING_AS_ERROR=OFF ^
@@ -342,11 +336,36 @@ jobs:
           cmake --build ..\out --config %BUILD_CONFIG% --parallel
           if errorlevel 1 exit /b 1
 
+      - name: Install Inno Setup.
+        if: env.ONLY_CACHE == 'false'
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
       - name: Move artifact.
         run: |
           set OUT=%TBUILD%\%REPO_NAME%\out\%BUILD_CONFIG%
+          set HELPER=%OUT%\modules\${{ matrix.arch }}\TelegramWidgetHelper.exe
           mkdir artifact
           copy "%OUT%\NoxGram.exe" "artifact\NoxGram-windows-${{ matrix.arch }}.exe"
+          if errorlevel 1 exit /b 1
+          if not exist "%HELPER%" (
+            echo ::error::The widget helper was not built: %HELPER%
+            exit /b 1
+          )
+          for /f "tokens=2" %%v in ('findstr /b "AppVersionStr " %TBUILD%\%REPO_NAME%\Telegram\build\version') do set VERSION=%%v
+          "%ProgramFiles(x86)%\Inno Setup 6\ISCC.exe" /Q ^
+            /DMyAppVersion=%VERSION% ^
+            /DMyAppVersionFull=%VERSION% ^
+            /DReleasePath=%OUT% ^
+            /DMyBuildTarget=${{ matrix.arch == 'arm64' && 'winarm' || 'win64' }} ^
+            /DMyOutputBaseFilename=NoxGram-windows-${{ matrix.arch }}-setup ^
+            %TBUILD%\%REPO_NAME%\Telegram\build\setup.iss
+          if errorlevel 1 exit /b 1
+          copy "%OUT%\NoxGram-windows-${{ matrix.arch }}-setup.exe" artifact\
           if errorlevel 1 exit /b 1
           echo ARTIFACT_NAME=NoxGram-windows-${{ matrix.arch }}>>%GITHUB_ENV%
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -371,4 +390,7 @@ jobs:
               --title "NoxGram $TAG" \
               --notes "NoxGram build. macOS: open the .dmg and drag NoxGram to Applications. Until the app is notarized, start it the first time with right-click → Open." \
             || true
-          gh release upload "$TAG" "artifact/NoxGram-windows-${{ matrix.arch }}.exe" -R "$GITHUB_REPOSITORY" --clobber
+          gh release upload "$TAG" \
+            "artifact/NoxGram-windows-${{ matrix.arch }}-setup.exe" \
+            "artifact/NoxGram-windows-${{ matrix.arch }}.exe" \
+            -R "$GITHUB_REPOSITORY" --clobber

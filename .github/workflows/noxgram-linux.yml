@@ -175,6 +175,7 @@ jobs:
           -D CMAKE_CXX_FLAGS_DEBUG="-O0 -fpch-preprocess" \
           -D CMAKE_COMPILE_WARNING_AS_ERROR=OFF \
           -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON \
+          -D CMAKE_INSTALL_LIBEXECDIR=bin \
           $API \
           $DEFINE
 
