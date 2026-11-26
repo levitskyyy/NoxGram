@@ -80,14 +80,6 @@ WebSocket::WebSocket(
 	_attemptTimer.moveToThread(thread);
 	_attemptTimer.setSingleShot(true);
 	_socket.setProxy(QNetworkProxy::NoProxy);
-	if (protocolForFiles) {
-		_socket.setSocketOption(
-			QAbstractSocket::SendBufferSizeSocketOption,
-			kFilesSendBufferSize);
-		_socket.setSocketOption(
-			QAbstractSocket::ReceiveBufferSizeSocketOption,
-			kFilesReceiveBufferSize);
-	}
 
 	const auto target = ParseTarget(protocolDcId, protocolForFiles);
 	_path = target.test ? u"/apiws_test"_q : u"/apiws"_q;
