@@ -375,6 +375,10 @@ void RememberEdit(not_null<HistoryItem*> item, const QString &newText) {
 		MakeRecord(item, old, date));
 }
 
+float64 Opacity(not_null<const HistoryItem*> item) {
+	return (item->isNoxDeleted() && Get(kDeletedTransparent)) ? 0.6 : 1.;
+}
+
 bool KeepsViewOnce() {
 	return Get(kKeepViewOnce);
 }

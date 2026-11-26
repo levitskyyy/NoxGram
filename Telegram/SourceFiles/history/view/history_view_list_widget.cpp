@@ -6,6 +6,7 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "history/view/history_view_list_widget.h"
+#include "noxgram/spy.h"
 #include "nagram/messages/online.h"
 #include "nagram/messages/content.h"
 #include "nagram/messages/reactions.h"
@@ -3566,7 +3567,14 @@ void ListWidget::paintEvent(QPaintEvent *e) {
 			context.fullMessageSelected = selection.fullMessageSelected;
 			context.messageSelection = selection.messageSelection;
 			context.highlight = _highlighter.state(item);
+			const auto noxOpacity = Nox::Spy::Opacity(item);
+			if (noxOpacity < 1.) {
+				p.setOpacity(noxOpacity);
+			}
 			view->draw(p, context);
+			if (noxOpacity < 1.) {
+				p.setOpacity(1.);
+			}
 		}
 		if (_translateTracker) {
 			_translateTracker->add(view);

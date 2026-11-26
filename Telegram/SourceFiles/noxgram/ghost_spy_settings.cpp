@@ -311,6 +311,10 @@ const auto kMeta = BuildHelper({
 		Nox::Tr(u"lng_nox_save_deleted"_q),
 		u"noxgram/spy/save-deleted"_q,
 		{ u"deleted"_q, u"spy"_q, u"history"_q });
+	AddToggle(builder, kDeletedTransparent,
+		Nox::Tr(u"lng_nox_deleted_transparent"_q),
+		u"noxgram/spy/deleted-transparent"_q,
+		{ u"deleted"_q, u"transparent"_q, u"spy"_q });
 	AddToggle(builder, kSaveEdits,
 		Nox::Tr(u"lng_nox_save_edits"_q),
 		u"noxgram/spy/save-edits"_q,

@@ -150,6 +150,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMimeData>
 #include "noxgram/menu.h"
+#include "noxgram/spy.h"
 
 namespace {
 
@@ -1654,7 +1655,14 @@ void HistoryInner::paintEvent(QPaintEvent *e) {
 			context.fullMessageSelected = selection.fullMessageSelected;
 			context.messageSelection = selection.messageSelection;
 			context.highlight = _widget->itemHighlight(view->data());
+						const auto noxOpacity = Nox::Spy::Opacity(view->data());
+			if (noxOpacity < 1.) {
+				p.setOpacity(noxOpacity);
+			}
 			view->draw(p, context);
+			if (noxOpacity < 1.) {
+				p.setOpacity(1.);
+			}
 			processPainted(view, top, height);
 
 			top += height;
@@ -1723,7 +1731,14 @@ void HistoryInner::paintEvent(QPaintEvent *e) {
 				context.fullMessageSelected = selection.fullMessageSelected;
 				context.messageSelection = selection.messageSelection;
 				context.highlight = _widget->itemHighlight(item);
+								const auto noxOpacity = Nox::Spy::Opacity(view->data());
+				if (noxOpacity < 1.) {
+					p.setOpacity(noxOpacity);
+				}
 				view->draw(p, context);
+				if (noxOpacity < 1.) {
+					p.setOpacity(1.);
+				}
 				processPainted(view, top, height);
 			}
 			top += height;

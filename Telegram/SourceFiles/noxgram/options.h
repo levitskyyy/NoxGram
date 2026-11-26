@@ -69,6 +69,9 @@ inline constexpr auto kGhostMenuToggle = Option<bool>{
 inline constexpr auto kSaveDeleted = Option<bool>{
 	"nagram.nox.saveDeleted", Scope::Device, true,
 	Category::Privacy, "lng_nox_save_deleted", kRefreshView };
+inline constexpr auto kDeletedTransparent = Option<bool>{
+	"nagram.nox.deletedTransparent", Scope::Device, true,
+	Category::Privacy, "lng_nox_deleted_transparent", kRefreshView };
 inline constexpr auto kSaveEdits = Option<bool>{
 	"nagram.nox.saveEdits", Scope::Device, true,
 	Category::Privacy, "lng_nox_save_edits" };
@@ -116,6 +119,7 @@ inline void RegisterOptions(Nagram::Registry &registry) {
 	Expects(registry.Add(kGhostTrayToggle));
 	Expects(registry.Add(kDemoMenuToggle));
 	Expects(registry.Add(kSaveDeleted));
+	Expects(registry.Add(kDeletedTransparent));
 	Expects(registry.Add(kSaveEdits));
 	Expects(registry.Add(kSaveForBots));
 	Expects(registry.Add(kKeepSelfDestructing));

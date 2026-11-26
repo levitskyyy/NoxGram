@@ -35,6 +35,8 @@ namespace Nox::Spy {
 
 void RememberEdit(not_null<HistoryItem*> item, const QString &newText);
 
+[[nodiscard]] float64 Opacity(not_null<const HistoryItem*> item);
+
 [[nodiscard]] bool KeepsViewOnce();
 void RememberViewOnce(not_null<HistoryItem*> item);
 [[nodiscard]] bool IgnoresExpiredEdit(
