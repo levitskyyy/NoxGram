@@ -10,6 +10,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "nagram/chats/recent_chats.h"
 #include "nagram/media/extras.h"
 #include "nagram/interface/main_menu.h"
+#include "nagram/privacy/options.h"
 #include "nagram/interface/appearance.h"
 
 #include "apiwrap.h"
@@ -805,6 +806,19 @@ void MainMenu::setupMenu() {
 		}) | rpl::on_next([](bool active) {
 			Nox::Ghost::SetActive(active);
 		}, ghost->lifetime());
+	}
+	if (Nagram::ForDevice().Get(Nox::kDemoMenuToggle)) {
+		using Nagram::Privacy::kDemoMode;
+		const auto demo = addAction(
+			tr::lng_nagram_demo_mode(),
+			{ &st::menuIconUserHide });
+		demo->toggleOn(Nagram::ForDevice().Value(kDemoMode));
+		demo->toggledChanges(
+		) | rpl::filter([](bool active) {
+			return (active != Nagram::ForDevice().Get(kDemoMode));
+		}) | rpl::on_next([](bool active) {
+			Expects(Nagram::ForDevice().Set(kDemoMode, active));
+		}, demo->lifetime());
 	}
 	addAction(
 		tr::lng_menu_settings(),

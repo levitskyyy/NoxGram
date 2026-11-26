@@ -18,6 +18,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/application.h"
 #include "core/core_settings.h"
 #include "data/data_channel.h"
+#include "data/data_peer.h"
 #include "data/data_histories.h"
 #include "data/data_session.h"
 #include "history/history.h"
@@ -145,6 +146,19 @@ bool SendTyping() {
 	return !Hides(kGhostHideTyping);
 }
 
+bool PromptBeforeStory(not_null<PeerData*> peer, bool own) {
+	return !own
+		&& !peer->isSelf()
+		&& !Active()
+		&& Get(kGhostHideStories)
+		&& Get(kGhostStoryPrompt);
+}
+
+bool InvertSilent() {
+	const auto mode = Nagram::ForDevice().Get(kSendWithoutSound);
+	return (mode == 2) || (mode == 1 && Active());
+}
+
 void NoteActivity(not_null<Main::Session*> session) {
 	if (Hides(kGhostOfflineAfterOnline)) {
 		Offline().note(session);
@@ -213,6 +227,7 @@ void ApplyScheduling(
 		? (delaySeconds * 6 + 4) / 5
 		: delaySeconds;
 	options.scheduled = base::unixtime::now() + delay;
+	options.noxGhostScheduled = true;
 }
 
 } // namespace Nox::Ghost

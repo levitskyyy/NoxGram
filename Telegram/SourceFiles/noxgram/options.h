@@ -48,6 +48,19 @@ inline constexpr auto kGhostReadOnAction = Option<bool>{
 inline constexpr auto kGhostScheduleSend = Option<bool>{
 	"nagram.nox.ghostScheduleSend", Scope::Device, false,
 	Category::Privacy, "lng_nox_ghost_schedule_send" };
+inline constexpr auto kSendWithoutSound = Option<int>{
+	"nagram.nox.sendWithoutSound", Scope::Device, 0,
+	Category::Privacy, "lng_nox_send_without_sound", 0u,
+	[](const int &value) { return value >= 0 && value <= 2; } };
+inline constexpr auto kGhostStoryPrompt = Option<bool>{
+	"nagram.nox.ghostStoryPrompt", Scope::Device, true,
+	Category::Privacy, "lng_nox_ghost_story_prompt" };
+inline constexpr auto kGhostTrayToggle = Option<bool>{
+	"nagram.nox.ghostTrayToggle", Scope::Device, true,
+	Category::Privacy, "lng_nox_ghost_tray_toggle" };
+inline constexpr auto kDemoMenuToggle = Option<bool>{
+	"nagram.nox.demoMenuToggle", Scope::Device, false,
+	Category::Privacy, "lng_nox_demo_menu_toggle" };
 inline constexpr auto kGhostMenuToggle = Option<bool>{
 	"nagram.nox.ghostMenuToggle", Scope::Device, true,
 	Category::Privacy, "lng_nox_ghost_menu_toggle" };
@@ -94,6 +107,10 @@ inline void RegisterOptions(Nagram::Registry &registry) {
 	Expects(registry.Add(kGhostReadOnAction));
 	Expects(registry.Add(kGhostScheduleSend));
 	Expects(registry.Add(kGhostMenuToggle));
+	Expects(registry.Add(kSendWithoutSound));
+	Expects(registry.Add(kGhostStoryPrompt));
+	Expects(registry.Add(kGhostTrayToggle));
+	Expects(registry.Add(kDemoMenuToggle));
 	Expects(registry.Add(kSaveDeleted));
 	Expects(registry.Add(kSaveEdits));
 	Expects(registry.Add(kSaveForBots));

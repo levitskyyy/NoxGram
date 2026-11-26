@@ -28,6 +28,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item.h"
 #include "history/history_unread_things.h"
 #include "lang/lang_keys.h"
+#include "noxgram/ghost.h"
+#include "noxgram/lang.h"
 #include "lottie/lottie_single_player.h"
 #include "ui/chat/chat_style.h"
 #include "ui/chat/chat_theme.h"
@@ -746,7 +748,9 @@ FillMenuResult FillSendMenu(
 
 	if (sending && type != Type::Reminder) {
 		menu->addAction(
-			tr::lng_send_silent_message(tr::now),
+			(Nox::Ghost::InvertSilent()
+				? Nox::TrNow(u"lng_nox_send_with_sound"_q)
+				: tr::lng_send_silent_message(tr::now)),
 			[=] { action({ Api::SendOptions{ .silent = true } }, details); },
 			&icons.menuMute);
 	}

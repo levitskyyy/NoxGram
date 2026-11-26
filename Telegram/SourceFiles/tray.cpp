@@ -14,6 +14,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "platform/platform_notifications_manager.h"
 #include "platform/platform_specific.h"
 #include "lang/lang_keys.h"
+#include "nagram/privacy/options.h"
+#include "noxgram/ghost.h"
+#include "noxgram/lang.h"
+#include "noxgram/options.h"
 
 #include <QtWidgets/QApplication>
 
@@ -108,6 +112,36 @@ void Tray::rebuildMenu() {
 			[=] { toggleSoundNotifications(); });
 	}
 
+	if (!Core::App().passcodeLocked()
+		&& Nagram::ForDevice().Get(Nox::kGhostTrayToggle)) {
+		auto ghostText = rpl::merge(
+			_textUpdates.events(),
+			Nox::Ghost::ActiveValue() | rpl::to_empty
+		) | rpl::map([] {
+			return Nox::TrNow(Nox::Ghost::Active()
+				? u"lng_nox_ghost_tray_off"_q
+				: u"lng_nox_ghost_tray_on"_q);
+		});
+		_tray.addAction(std::move(ghostText), [] {
+			Nox::Ghost::Toggle();
+		});
+		auto demoText = rpl::merge(
+			_textUpdates.events(),
+			Nagram::ForDevice().Value(
+				Nagram::Privacy::kDemoMode) | rpl::to_empty
+		) | rpl::map([] {
+			return Nox::TrNow(
+				Nagram::ForDevice().Get(Nagram::Privacy::kDemoMode)
+					? u"lng_nox_demo_tray_off"_q
+					: u"lng_nox_demo_tray_on"_q);
+		});
+		_tray.addAction(std::move(demoText), [] {
+			auto &options = Nagram::ForDevice();
+			Expects(options.Set(
+				Nagram::Privacy::kDemoMode,
+				!options.Get(Nagram::Privacy::kDemoMode)));
+		});
+	}
 	_tray.addAction(tr::lng_nagram_quit_from_tray(), [] { Core::Quit(); });
 
 	TrayAccountsMenu::Fill(_tray);

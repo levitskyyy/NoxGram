@@ -60,6 +60,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/checkbox.h"
 #include "ui/item_text_options.h"
 #include "lang/lang_keys.h"
+#include "noxgram/ghost.h"
 
 #include "styles/style_layers.h"
 
@@ -631,7 +632,7 @@ QString NewMessagePostAuthor(const Api::SendAction &action) {
 bool ShouldSendSilent(
 		not_null<PeerData*> peer,
 		const Api::SendOptions &options) {
-	return options.silent
+	return (options.silent != Nox::Ghost::InvertSilent())
 		|| (peer->isBroadcast()
 			&& peer->owner().notifySettings().silentPosts(peer))
 		|| (peer->session().supportMode()

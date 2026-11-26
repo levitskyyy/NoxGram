@@ -38,6 +38,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/file_upload.h"
 #include "mainwidget.h"
 #include "apiwrap.h"
+#include "noxgram/ghost.h"
 
 namespace Api {
 namespace {
@@ -200,6 +201,9 @@ void SendExistingMedia(
 		Fn<MTPInputMedia()> inputMedia,
 		Data::FileOrigin origin,
 		std::optional<MsgId> localMessageId) {
+	Nox::Ghost::ApplyScheduling(
+		&message.action.history->session(),
+		message.action.options);
 	const auto history = message.action.history;
 	const auto peer = history->peer;
 	const auto session = &history->session();

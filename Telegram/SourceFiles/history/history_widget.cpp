@@ -1227,7 +1227,8 @@ HistoryWidget::HistoryWidget(
 		const auto lastKeyboardUsed = lastForceReplyReplied(
 			action.replyTo.messageId);
 		if (action.replaceMediaOf) {
-		} else if (action.options.scheduled) {
+		} else if (action.options.scheduled
+				&& !action.options.noxGhostScheduled) {
 			cancelReplyOrSuggest(lastKeyboardUsed);
 			crl::on_main(this, [=, history = action.history] {
 				controller->showSection(

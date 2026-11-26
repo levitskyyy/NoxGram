@@ -4351,7 +4351,9 @@ void ApiWrap::sendVoiceMessage(
 		std::shared_ptr<Media::Encode::VideoSource> videoSource,
 		const SendAction &action) {
 	const auto caption = TextWithTags();
-	const auto to = FileLoadTaskOptions(action);
+	auto scheduled = action;
+	Nox::Ghost::ApplyScheduling(_session, scheduled.options, 17);
+	const auto to = FileLoadTaskOptions(scheduled);
 	_fileLoader->addTask(
 		std::make_unique<FileLoadTask>(FileLoadTask::VoiceArgs{
 			.session = &session(),

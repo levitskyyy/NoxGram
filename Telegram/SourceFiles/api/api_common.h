@@ -38,6 +38,7 @@ struct SendOptions {
 	bool hideViaBot = false;
 	bool mediaSpoiler = false;
 	bool welcomeTemplate = false;
+	bool noxGhostScheduled = false;
 	crl::time ttlSeconds = 0;
 	SuggestOptions suggest;
 

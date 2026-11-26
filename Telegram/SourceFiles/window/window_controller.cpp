@@ -33,7 +33,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/themes/window_theme_editor.h"
 #include "ui/boxes/confirm_box.h"
 #include "data/components/promo_suggestions.h"
+#include "data/data_story.h"
 #include "data/data_thread.h"
+#include "noxgram/ghost.h"
+#include "noxgram/lang.h"
 #include "settings/settings_common.h"
 #include "wallet/wallet_panel.h"
 #include "wallet/wallet_session.h"
@@ -645,6 +648,34 @@ Window::Columns &Controller::columns() const {
 }
 
 void Controller::openInMediaView(Media::View::OpenRequest &&request) {
+	const auto story = request.story();
+	if (story && Nox::Ghost::PromptBeforeStory(story->peer(), story->out())) {
+		const auto shared = std::make_shared<Media::View::OpenRequest>(
+			std::move(request));
+		const auto weak = base::make_weak(this);
+		const auto open = [=] {
+			if (const auto strong = weak.get()) {
+				strong->_openInMediaViewRequests.fire_copy(*shared);
+			}
+		};
+		uiShow()->showBox(Ui::MakeConfirmBox({
+			.text = Nox::TrNow(u"lng_nox_ghost_story_prompt_text"_q),
+			.confirmed = [=](Fn<void()> close) {
+				Nox::Ghost::SetActive(true);
+				close();
+				open();
+			},
+			.cancelled = [=](Fn<void()> close) {
+				close();
+				open();
+			},
+			.confirmText = Nox::TrNow(u"lng_nox_ghost_story_prompt_on"_q),
+			.cancelText = Nox::TrNow(u"lng_nox_ghost_story_prompt_skip"_q),
+			.title = Nox::TrNow(u"lng_nox_ghost_mode"_q),
+			.strictCancel = true,
+		}));
+		return;
+	}
 	_openInMediaViewRequests.fire(std::move(request));
 }
 

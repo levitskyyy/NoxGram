@@ -12,6 +12,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <rpl/producer.h>
 
 class History;
+class PeerData;
 class HistoryItem;
 
 namespace Api {
@@ -35,6 +36,12 @@ void Toggle();
 [[nodiscard]] bool SendReadStories();
 [[nodiscard]] bool SendOnline();
 [[nodiscard]] bool SendTyping();
+
+// Asks to turn ghost mode on before someone else's story is opened.
+[[nodiscard]] bool PromptBeforeStory(not_null<PeerData*> peer, bool own);
+
+// Messages go silent by default, the send menu then offers sound.
+[[nodiscard]] bool InvertSilent();
 
 // After an action that the server treats as activity (sending a message,
 // reacting, voting) it marks the account online. Ghost mode answers with

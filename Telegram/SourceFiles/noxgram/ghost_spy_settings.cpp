@@ -197,6 +197,51 @@ void AddStorage(SectionBuilder &builder) {
 	});
 }
 
+[[nodiscard]] QString SendWithoutSoundText(int value) {
+	return Nox::TrNow((value == 2)
+		? u"lng_nox_send_without_sound_always"_q
+		: (value == 1)
+		? u"lng_nox_send_without_sound_ghost"_q
+		: u"lng_nox_send_without_sound_never"_q);
+}
+
+void SendWithoutSoundBox(not_null<Ui::GenericBox*> box) {
+	box->setTitle(Nox::Tr(u"lng_nox_send_without_sound"_q));
+	const auto group = std::make_shared<Ui::RadiobuttonGroup>(
+		Nagram::ForDevice().Get(kSendWithoutSound));
+	for (auto value = 0; value != 3; ++value) {
+		box->addRow(object_ptr<Ui::Radiobutton>(
+			box,
+			group,
+			value,
+			SendWithoutSoundText(value),
+			st::settingsSendType), st::settingsSendTypePadding);
+	}
+	group->setChangedCallback([=](int value) {
+		Expects(Nagram::ForDevice().Set(kSendWithoutSound, value));
+		box->closeBox();
+	});
+	box->addButton(tr::lng_cancel(), [=] { box->closeBox(); });
+}
+
+void AddSendWithoutSound(SectionBuilder &builder) {
+	const auto controller = builder.controller();
+	builder.addButton({
+		.id = u"noxgram/ghost/send-without-sound"_q,
+		.title = Nox::Tr(u"lng_nox_send_without_sound"_q),
+		.st = &st::settingsButtonNoIcon,
+		.label = Nagram::ForDevice().Value(
+			kSendWithoutSound
+		) | rpl::map(SendWithoutSoundText),
+		.onClick = [=] {
+			if (controller) {
+				controller->show(Box(SendWithoutSoundBox));
+			}
+		},
+		.keywords = { u"silent"_q, u"sound"_q, u"ghost"_q },
+	});
+}
+
 const auto kMeta = BuildHelper({
 	.id = GhostSpySection::Id(),
 	.parentId = Nagram::HomeId(),
@@ -242,10 +287,24 @@ const auto kMeta = BuildHelper({
 		u"noxgram/ghost/schedule-send"_q,
 		{ u"schedule"_q, u"send"_q, u"ghost"_q });
 	builder.addDividerText(Nox::Tr(u"lng_nox_ghost_schedule_send_about"_q));
+	AddSendWithoutSound(builder);
+	builder.addDividerText(Nox::Tr(u"lng_nox_send_without_sound_about"_q));
+	AddToggle(builder, kGhostStoryPrompt,
+		Nox::Tr(u"lng_nox_ghost_story_prompt"_q),
+		u"noxgram/ghost/story-prompt"_q,
+		{ u"stories"_q, u"ask"_q, u"ghost"_q });
 	AddToggle(builder, kGhostMenuToggle,
 		Nox::Tr(u"lng_nox_ghost_menu_toggle"_q),
 		u"noxgram/ghost/menu-toggle"_q,
 		{ u"menu"_q, u"ghost"_q });
+	AddToggle(builder, kGhostTrayToggle,
+		Nox::Tr(u"lng_nox_ghost_tray_toggle"_q),
+		u"noxgram/ghost/tray-toggle"_q,
+		{ u"tray"_q, u"ghost"_q, u"presentation"_q });
+	AddToggle(builder, kDemoMenuToggle,
+		Nox::Tr(u"lng_nox_demo_menu_toggle"_q),
+		u"noxgram/ghost/demo-menu-toggle"_q,
+		{ u"menu"_q, u"presentation"_q, u"streamer"_q });
 
 	builder.addSubsectionTitle(Nox::Tr(u"lng_nox_spy_title"_q));
 	AddToggle(builder, kSaveDeleted,
