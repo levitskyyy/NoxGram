@@ -39,6 +39,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item.h"
 #include "history/history_item_helpers.h"
 #include "history/view/controls/history_view_forward_panel.h"
+#include "noxgram/forward.h"
 #include "nagram/compose/options.h"
 #include "nagram/chats/recent_chats.h"
 #include "history/view/history_view_element.h"
@@ -2006,6 +2007,33 @@ ShareBox::SubmitCallback ShareBox::DefaultForwardCallback(
 			show->showBox(MakeSendErrorBox(error, result.size() > 1));
 			return;
 		} else if (!checkPaid()) {
+			return;
+		}
+		if (ranges::any_of(items, Nox::Forward::NeedsReupload)) {
+			const auto forwardFirst = Nagram::ForDevice().Get(
+				Nagram::Compose::kForwardBeforeComment);
+			for (const auto &thread : result) {
+				auto action = Api::SendAction(thread, options);
+				action.clearDraft = false;
+				const auto sendComment = [&] {
+					if (!comment.text.isEmpty()) {
+						auto message = Api::MessageToSend(action);
+						message.textWithTags = comment;
+						history->session().api().sendMessage(
+							std::move(message));
+					}
+				};
+				if (!forwardFirst) {
+					sendComment();
+				}
+				Nox::Forward::Send(items, action, forwardOptions);
+				if (forwardFirst) {
+					sendComment();
+				}
+			}
+			if (show->valid()) {
+				show->hideLayer();
+			}
 			return;
 		}
 

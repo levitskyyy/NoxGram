@@ -18,6 +18,13 @@ namespace Nox::Spy {
 [[nodiscard]] int64 MediaSize(not_null<HistoryItem*> item);
 [[nodiscard]] int64 MediaLimitBytes(int index);
 
+// Calls done once the photo or file of the item is in target.
+bool FetchMedia(
+	not_null<HistoryItem*> item,
+	const QString &target,
+	Fn<void(bool)> done);
+[[nodiscard]] QString MediaExtension(not_null<HistoryItem*> item);
+
 // Copies the photo or file of a deleted message into the spy folder,
 // from memory, the cache or the downloads, or loads it if it is not there.
 void SaveMedia(not_null<HistoryItem*> item);

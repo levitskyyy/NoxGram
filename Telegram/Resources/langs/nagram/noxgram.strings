@@ -78,3 +78,9 @@ NoxGram strings. Ghost mode and spy mode are modelled on AyuGram Desktop
 "lng_nox_demo_tray_on" = "Turn on presentation mode";
 "lng_nox_demo_tray_off" = "Turn off presentation mode";
 "lng_nox_demo_menu_toggle" = "Presentation mode in the main menu";
+"lng_nox_protected_title" = "Chats with restricted forwarding";
+"lng_nox_forward_protected" = "Forward from restricted chats";
+"lng_nox_forward_protected_about" = "Where forwarding is turned off, NoxGram downloads the messages and sends them again as new ones: text with formatting, photos, videos, files, albums and voice messages. The original author is not shown. Copying and saving are turned on by “Allow copying and saving protected content” in the Nagram privacy settings.";
+"lng_nox_forward_started" = "Forwarding {count} messages: files are downloaded and sent again…";
+"lng_nox_forward_done" = "Forwarded.";
+"lng_nox_forward_done_skipped" = "Forwarded, {count} could not be downloaded.";

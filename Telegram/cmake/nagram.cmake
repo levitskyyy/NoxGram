@@ -158,6 +158,7 @@ set(nagram_sources
     nagram/services/transcription.cpp
     nagram/services/transcription_queue.cpp
     nagram/services/system_ai.cpp
+    noxgram/forward.cpp
     noxgram/ghost.cpp
     noxgram/ghost_spy_settings.cpp
     noxgram/lang.cpp

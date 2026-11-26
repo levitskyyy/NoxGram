@@ -80,3 +80,9 @@ NoxGram: русский перевод.
 "lng_nox_demo_tray_on" = "Включить режим презентации";
 "lng_nox_demo_tray_off" = "Выключить режим презентации";
 "lng_nox_demo_menu_toggle" = "Режим презентации в главном меню";
+"lng_nox_protected_title" = "Чаты с запретом пересылки";
+"lng_nox_forward_protected" = "Пересылать из закрытых чатов";
+"lng_nox_forward_protected_about" = "Там, где пересылка запрещена, NoxGram скачивает сообщения и отправляет их заново как новые: текст с форматированием, фото, видео, файлы, альбомы и голосовые. Автор оригинала не показывается. Копирование и сохранение включаются пунктом «Allow copying and saving protected content» в настройках конфиденциальности Nagram.";
+"lng_nox_forward_started" = "Пересылаю сообщений: {count}. Файлы скачиваются и отправляются заново…";
+"lng_nox_forward_done" = "Переслано.";
+"lng_nox_forward_done_skipped" = "Переслано, не удалось скачать: {count}.";

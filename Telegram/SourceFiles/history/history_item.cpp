@@ -93,6 +93,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_chat.h"
 #include "styles/style_credits.h"
 #include "styles/style_dialogs.h"
+#include "noxgram/forward.h"
 #include "noxgram/spy.h"
 
 namespace {
@@ -3491,9 +3492,12 @@ bool HistoryItem::allowsReschedule() const {
 }
 
 bool HistoryItem::allowsForward() const {
-	return !isService()
-		&& (isRegular() || isEphemeral())
-		&& !forbidsForward()
+	if (isService() || !(isRegular() || isEphemeral())) {
+		return false;
+	} else if (Nox::Forward::NeedsReupload(this)) {
+		return true;
+	}
+	return !forbidsForward()
 		&& history()->peer->allowsForwarding()
 		&& (!_media || _media->allowsForward());
 }

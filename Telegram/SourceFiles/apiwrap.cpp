@@ -115,6 +115,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/file_upload.h"
 #include "storage/storage_account.h"
 #include "tgw/tgw_storage.h"
+#include "noxgram/forward.h"
 #include "noxgram/ghost.h"
 
 namespace {
@@ -3991,6 +3992,16 @@ FullMsgId ApiWrap::forwardMessages(
 	if (draft.items.empty()) {
 		if (successCallback) {
 			successCallback();
+		}
+		return {};
+	}
+	if (ranges::any_of(draft.items, Nox::Forward::NeedsReupload)) {
+		Nox::Forward::Send(draft.items, action, draft.options);
+		if (successCallback) {
+			successCallback();
+		}
+		if (sentCallback) {
+			sentCallback({});
 		}
 		return {};
 	}

@@ -89,6 +89,10 @@ inline constexpr auto kDeletedMediaLimit = Option<int>{
 	Category::Privacy, "lng_nox_deleted_media_limit", 0u,
 	[](const int &value) { return value >= 0 && value <= 4; } };
 
+inline constexpr auto kForwardProtected = Option<bool>{
+	"nagram.nox.forwardProtected", Scope::Device, true,
+	Category::Privacy, "lng_nox_forward_protected" };
+
 // Connection: MTProto inside a WebSocket to web.telegram.org.
 inline constexpr auto kWsTransport = Option<bool>{
 	"nagram.nox.wsTransport", Scope::Device, false,
@@ -118,6 +122,7 @@ inline void RegisterOptions(Nagram::Registry &registry) {
 	Expects(registry.Add(kKeepViewOnce));
 	Expects(registry.Add(kSaveDeletedMedia));
 	Expects(registry.Add(kDeletedMediaLimit));
+	Expects(registry.Add(kForwardProtected));
 	Expects(registry.Add(kWsTransport));
 	Expects(registry.Add(kWsDirectFallback));
 }

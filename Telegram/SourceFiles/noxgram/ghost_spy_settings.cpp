@@ -335,6 +335,13 @@ const auto kMeta = BuildHelper({
 	AddMediaLimit(builder);
 	builder.addDividerText(Nox::Tr(u"lng_nox_spy_about"_q));
 	AddStorage(builder);
+
+	builder.addSubsectionTitle(Nox::Tr(u"lng_nox_protected_title"_q));
+	AddToggle(builder, kForwardProtected,
+		Nox::Tr(u"lng_nox_forward_protected"_q),
+		u"noxgram/protected/forward"_q,
+		{ u"forward"_q, u"protected"_q, u"restricted"_q, u"noforwards"_q });
+	builder.addDividerText(Nox::Tr(u"lng_nox_forward_protected_about"_q));
 });
 
 const SectionBuildMethod GhostSpySection::kBuild = kMeta.build;

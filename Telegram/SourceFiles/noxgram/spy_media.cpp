@@ -33,8 +33,8 @@ constexpr auto kGiveUpAfter = 10 * 60 * crl::time(1000);
 struct Pending {
 	PeerId peer = 0;
 	MsgId msg = 0;
-	QString relative;
 	QString target;
+	Fn<void(bool)> done;
 	std::shared_ptr<Data::PhotoMedia> photo;
 	DocumentData *document = nullptr;
 	std::shared_ptr<Data::DocumentMedia> documentMedia;
@@ -86,7 +86,10 @@ public:
 	}
 
 	void add(Pending pending) {
-		if (finish(pending)) {
+		if (ready(pending)) {
+			if (pending.done) {
+				pending.done(true);
+			}
 			return;
 		}
 		start(pending);
@@ -115,15 +118,8 @@ private:
 		}
 	}
 
-	[[nodiscard]] bool finish(const Pending &pending) {
-		auto &database = DatabaseFor(_session);
-		const auto done = [&] {
-			const auto info = QFileInfo(pending.target);
-			database.setMedia(
-				pending.peer,
-				pending.msg,
-				pending.relative,
-				info.size());
+	[[nodiscard]] bool ready(const Pending &pending) {
+		const auto done = [] {
 			return true;
 		};
 		if (QFileInfo::exists(pending.target)
@@ -163,15 +159,18 @@ private:
 
 	void check() {
 		const auto now = crl::now();
+		auto results = std::vector<std::pair<Fn<void(bool)>, bool>>();
 		for (auto i = begin(_pending); i != end(_pending);) {
 			const auto failed = i->document
 				&& !i->document->loading()
 				&& (i->document->status == FileDownloadFailed
 					|| i->document->cancelled());
-			if (finish(*i)) {
+			if (ready(*i)) {
+				results.emplace_back(std::move(i->done), true);
 				i = _pending.erase(i);
 			} else if (failed || (now - i->since > kGiveUpAfter)) {
 				QFile::remove(i->target);
+				results.emplace_back(std::move(i->done), false);
 				i = _pending.erase(i);
 			} else {
 				if (i->document
@@ -180,6 +179,11 @@ private:
 					start(*i);
 				}
 				++i;
+			}
+		}
+		for (const auto &[done, ok] : results) {
+			if (done) {
+				done(ok);
 			}
 		}
 	}
@@ -266,6 +270,37 @@ int64 MediaLimitBytes(int index) {
 	return std::numeric_limits<int64>::max();
 }
 
+bool FetchMedia(
+		not_null<HistoryItem*> item,
+		const QString &target,
+		Fn<void(bool)> done) {
+	const auto media = item->media();
+	const auto photo = media ? media->photo() : nullptr;
+	const auto document = media ? media->document() : nullptr;
+	if (!photo && !document) {
+		return false;
+	}
+	auto pending = Pending{
+		.peer = item->history()->peer->id,
+		.msg = item->id,
+		.target = target,
+		.done = std::move(done),
+		.since = crl::now(),
+	};
+	if (photo) {
+		pending.photo = photo->createMediaView();
+	} else {
+		pending.document = document;
+		pending.documentMedia = document->createMediaView();
+	}
+	SaverFor(&item->history()->session()).add(std::move(pending));
+	return true;
+}
+
+QString MediaExtension(not_null<HistoryItem*> item) {
+	return Extension(item);
+}
+
 void SaveMedia(not_null<HistoryItem*> item) {
 	const auto &options = Nagram::ForDevice();
 	if (!options.Get(kSaveDeletedMedia)) {
@@ -275,9 +310,7 @@ void SaveMedia(not_null<HistoryItem*> item) {
 	if (kind == MediaKind::None || kind == MediaKind::Other) {
 		return;
 	}
-	const auto media = item->media();
-	const auto photo = media->photo();
-	const auto document = media->document();
+	const auto document = item->media()->document();
 	if (document
 		&& document->size > MediaLimitBytes(
 			options.Get(kDeletedMediaLimit))) {
@@ -286,28 +319,26 @@ void SaveMedia(not_null<HistoryItem*> item) {
 	const auto session = &item->history()->session();
 	auto &database = DatabaseFor(session);
 	const auto peer = item->history()->peer->id;
+	const auto msg = item->id;
 	const auto folder = QString::number(peer.value);
 	QDir().mkpath(database.mediaFolder() + '/' + folder);
 	const auto relative = u"media/"_q
 		+ folder
 		+ '/'
-		+ QString::number(item->id.bare)
+		+ QString::number(msg.bare)
 		+ '.'
 		+ Extension(item);
-	auto pending = Pending{
-		.peer = peer,
-		.msg = item->id,
-		.relative = relative,
-		.target = database.absolute(relative),
-		.since = crl::now(),
-	};
-	if (photo) {
-		pending.photo = photo->createMediaView();
-	} else if (document) {
-		pending.document = document;
-		pending.documentMedia = document->createMediaView();
-	}
-	SaverFor(session).add(std::move(pending));
+	const auto target = database.absolute(relative);
+	const auto weak = base::make_weak(session);
+	FetchMedia(item, target, [=](bool ok) {
+		if (const auto strong = weak.get(); strong && ok) {
+			DatabaseFor(strong).setMedia(
+				peer,
+				msg,
+				relative,
+				QFileInfo(target).size());
+		}
+	});
 }
 
 } // namespace Nox::Spy
