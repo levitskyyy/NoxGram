@@ -87,3 +87,4 @@ NoxGram: русский перевод.
 "lng_nox_forward_done" = "Переслано.";
 "lng_nox_forward_done_skipped" = "Переслано, не удалось скачать: {count}.";
 "lng_nox_deleted_transparent" = "Удалённые сообщения полупрозрачными";
+"lng_nox_user_not_found" = "Не удалось найти этого пользователя.";

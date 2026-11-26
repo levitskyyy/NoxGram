@@ -85,3 +85,4 @@ NoxGram strings. Ghost mode and spy mode are modelled on AyuGram Desktop
 "lng_nox_forward_done" = "Forwarded.";
 "lng_nox_forward_done_skipped" = "Forwarded, {count} could not be downloaded.";
 "lng_nox_deleted_transparent" = "Show deleted messages semi-transparent";
+"lng_nox_user_not_found" = "Couldn't find this user.";

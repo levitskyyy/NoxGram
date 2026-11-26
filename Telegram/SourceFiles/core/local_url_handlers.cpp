@@ -16,6 +16,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/qthelp_url.h"
 #include "lang/lang_cloud_manager.h"
 #include "lang/lang_keys.h"
+#include "noxgram/links.h"
 #include "nagram/settings/link_format.h"
 #include "core/update_checker.h"
 #include "core/application.h"
@@ -1975,6 +1976,14 @@ const std::vector<LocalUrlHandler> &LocalUrlHandlers() {
 		{
 			u"^oauth/?\\?(.+)(#|$)"_q,
 			ResolveOAuth
+		},
+		{
+			u"^user/?\\?id=(\\d+)(&|#|$)"_q,
+			Nox::Links::ResolveUserById
+		},
+		{
+			u"^openmessage/?\\?user_id=(\\d+)(&|#|$)"_q,
+			Nox::Links::ResolveUserById
 		},
 		{
 			u"^([^\\?]+)(\\?|#|$)"_q,

@@ -162,6 +162,7 @@ set(nagram_sources
     noxgram/ghost.cpp
     noxgram/ghost_spy_settings.cpp
     noxgram/lang.cpp
+    noxgram/links.cpp
     noxgram/menu.cpp
     noxgram/spy.cpp
     noxgram/spy_db.cpp
