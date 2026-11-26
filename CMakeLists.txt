@@ -20,7 +20,7 @@ project(Telegram
     LANGUAGES C CXX
     VERSION ${desktop_app_version_cmake}
     DESCRIPTION "NoxGram Desktop messenger"
-    HOMEPAGE_URL "https://gitlab.com/levitskyyy/NoxGram"
+    HOMEPAGE_URL "https://github.com/levitskyyy/NoxGram"
 )
 
 if (APPLE)

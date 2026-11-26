@@ -48,11 +48,11 @@ rpl::producer<TextWithEntities> Text2() {
 		lt_gpl_link,
 		rpl::single(tr::link(
 			"GNU GPL",
-			"https://gitlab.com/levitskyyy/NoxGram/-/blob/noxgram/LICENSE")),
+			"https://github.com/levitskyyy/NoxGram/blob/noxgram/LICENSE")),
 		lt_github_link,
 		rpl::single(tr::link(
 			"GitHub",
-			"https://gitlab.com/levitskyyy/NoxGram")),
+			"https://github.com/levitskyyy/NoxGram")),
 		tr::marked);
 }
 

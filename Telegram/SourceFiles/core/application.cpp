@@ -1391,7 +1391,7 @@ bool Application::openInternalUrl(const QString &url, QVariant context) {
 }
 
 QString Application::changelogLink() const {
-	return u"https://gitlab.com/levitskyyy/NoxGram/-/releases"_q;
+	return u"https://github.com/levitskyyy/NoxGram/releases"_q;
 }
 
 bool Application::openCustomUrl(

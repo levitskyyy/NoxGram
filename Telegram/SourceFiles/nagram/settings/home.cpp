@@ -60,7 +60,7 @@ const auto kMeta = BuildHelper({
 		.title = tr::lng_nagram_source_code(),
 		.icon = { &st::menuIconLink },
 		.onClick = [] {
-			UrlClickHandler::Open(u"https://gitlab.com/levitskyyy/NoxGram"_q);
+			UrlClickHandler::Open(u"https://github.com/levitskyyy/NoxGram"_q);
 		},
 	});
 	builder.addSectionButton({

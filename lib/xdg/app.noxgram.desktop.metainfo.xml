@@ -14,12 +14,12 @@
         <category>InstantMessaging</category>
     </categories>
     <developer id="xyz.nextalone"><name>NoxGram contributors</name></developer>
-    <url type="homepage">https://gitlab.com/levitskyyy/NoxGram/</url>
+    <url type="homepage">https://github.com/levitskyyy/NoxGram/</url>
     <url type="faq">https://telegram.org/faq</url>
-    <url type="bugtracker">https://gitlab.com/levitskyyy/NoxGram/-/issues</url>
+    <url type="bugtracker">https://github.com/levitskyyy/NoxGram/issues</url>
     <url type="translate">https://translations.telegram.org/</url>
-    <url type="vcs-browser">https://gitlab.com/levitskyyy/NoxGram</url>
-    <url type="contribute">https://gitlab.com/levitskyyy/NoxGram/-/blob/noxgram/.github/CONTRIBUTING.md</url>
+    <url type="vcs-browser">https://github.com/levitskyyy/NoxGram</url>
+    <url type="contribute">https://github.com/levitskyyy/NoxGram/blob/noxgram/.github/CONTRIBUTING.md</url>
     <branding>
         <color type="primary" scheme_preference="light">#edf0f2</color>
         <color type="primary" scheme_preference="dark">#2d363f</color>
