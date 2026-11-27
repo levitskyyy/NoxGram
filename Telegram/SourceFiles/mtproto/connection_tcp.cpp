@@ -252,11 +252,13 @@ TcpConnection::TcpConnection(
 	not_null<Instance*> instance,
 	QThread *thread,
 	const ProxyData &proxy,
-	bool webSocket)
+	bool webSocket,
+	bool webSocketForFiles)
 : AbstractConnection(thread, proxy)
 , _instance(instance)
 , _checkNonce(base::RandomValue<MTPint128>())
-, _webSocket(webSocket) {
+, _webSocket(webSocket)
+, _webSocketForFiles(webSocketForFiles) {
 }
 
 ConnectionPointer TcpConnection::clone(const ProxyData &proxy) {
@@ -264,7 +266,8 @@ ConnectionPointer TcpConnection::clone(const ProxyData &proxy) {
 		_instance,
 		thread(),
 		proxy,
-		_webSocket);
+		_webSocket,
+		_webSocketForFiles);
 }
 
 void TcpConnection::ensureAvailableInBuffer(int amount) {
@@ -530,7 +533,7 @@ void TcpConnection::connectToServer(
 		? _proxy.secretFromMtprotoPassword()
 		: protocolSecret;
 	if (_webSocket) {
-		_address = WebSocket::HostForDc(protocolDcId, protocolForFiles);
+		_address = WebSocket::HostForDc(protocolDcId, _webSocketForFiles);
 		_port = 443;
 		_protocol = Protocol::Create(secret);
 	} else if (proxyProtocol) {
@@ -546,7 +549,7 @@ void TcpConnection::connectToServer(
 		? std::make_unique<WebSocket>(
 			thread(),
 			protocolDcId,
-			protocolForFiles)
+			_webSocketForFiles)
 		: (_proxy.type == ProxyData::Type::Web)
 		? std::make_unique<WebProxySocket>(thread(), _proxy)
 		: AbstractSocket::Create(

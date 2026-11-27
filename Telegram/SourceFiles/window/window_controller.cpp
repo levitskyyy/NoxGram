@@ -33,6 +33,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/themes/window_theme_editor.h"
 #include "ui/boxes/confirm_box.h"
 #include "data/components/promo_suggestions.h"
+#include "data/data_session.h"
 #include "data/data_stories.h"
 #include "data/data_story.h"
 #include "data/data_thread.h"

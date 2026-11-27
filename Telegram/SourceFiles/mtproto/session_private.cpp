@@ -229,7 +229,8 @@ void SessionPrivate::appendTestConnection(
 				_instance,
 				thread(),
 				_options->proxy,
-				true)
+				true,
+				isMediaClusterDcId(_shiftedDcId))
 			: AbstractConnection::Create(
 				_instance,
 				protocol,
