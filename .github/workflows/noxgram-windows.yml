@@ -57,13 +57,13 @@ jobs:
     steps:
       - name: Prepare directories.
         run: |
-          mkdir %userprofile%\TBuild\Libraries
-          mklink /d %GITHUB_WORKSPACE%\TBuild %userprofile%\TBuild
+          mkdir D:\TBuild\Libraries
+          mklink /d %GITHUB_WORKSPACE%\TBuild D:\TBuild
           echo TBUILD=%GITHUB_WORKSPACE%\TBuild>>%GITHUB_ENV%
           echo LibrariesPath=%GITHUB_WORKSPACE%\TBuild\Libraries${{ matrix.arch == 'x64' && '\win64' || '' }}>>%GITHUB_ENV%
 
-      # Building Qt in both configurations fills the system drive of the
-      # hosted runner.
+      # The libraries are built on D:, which has far more room than the
+      # system drive; C: still holds the toolchains, so trim it as well.
       - name: Free up disk space for the libraries.
         shell: pwsh
         run: |
